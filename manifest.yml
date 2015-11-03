@@ -1,0 +1,8 @@
+applications:
+- memory: 1G
+  host: cs6310-api
+  name: cs6310-api
+  path: cs6310-client-api/target/cs6310-client-api.war
+  instances: 1
+  services: 
+  - aquifer-DB

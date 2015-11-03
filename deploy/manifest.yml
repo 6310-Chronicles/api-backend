@@ -1,0 +1,8 @@
+applications:
+- disk_quota: 1G
+  host: aquifer-api-v1
+  name: aquifer-api-v1
+  path: ../aquifer-client-api/target/aquifer-client-api.war
+  instances: 1
+  services: 
+  - aquifer-DB

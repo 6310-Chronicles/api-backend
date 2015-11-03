@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             version="1.0">
+
+
+    <persistence-unit name="PU">
+
+        <jta-data-source>jdbc/aquifer-DB</jta-data-source>
+
+        <class>com.cs6310.backend.model.Role</class>
+        <class>com.cs6310.backend.model.AccessCredential</class>
+        <class>com.cs6310.backend.model.Student</class>
+        <class>com.cs6310.backend.model.PersonDetails</class>
+        <class>com.cs6310.backend.model.Permit</class>
+
+        <properties>
+            <!-- <property name="openjpa.jdbc.Schema" value="aquifer-database0002"/> -->
+            <!--<property name="openjpa.jdbc.Schema" value="aquifer-database-p02"/>-->
+            <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true,schemaAction='add')"/>
+            <property name="openjpa.jdbc.UpdateManager" value="operation-order"/>
+            <property name="openjpa.jdbc.TransactionIsolation" value="read-committed"/>
+            <property name="openjpa.LockManager"
+                      value="pessimistic(VersionCheckOnReadLock=true,VersionUpdateOnWriteLock=true)"/>
+            <property name="openjpa.LockTimeout" value="100000"/>
+            <property name="openjpa.Log" value="DefaultLevel=WARN, Tool=INFO"/>
+            <property name="openjpa.DynamicEnhancementAgent" value="true"/>
+            <property name="RuntimeUnenhancedClasses" value="supported"/>
+            <!--<property name="openjpa.RuntimeUnenhancedClasses" value="unsupported"/>-->
+
+            <!-- <property name="openjpa.ConnectionDriverName" value="com.ibm.db2.jcc.DB2Driver"/> -->
+
+        </properties>
+    </persistence-unit>
+
+</persistence>
