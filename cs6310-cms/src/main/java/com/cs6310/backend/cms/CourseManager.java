@@ -98,8 +98,6 @@ public class CourseManager {
             Query query = entityManager
                     .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             query.setParameter("uuid", uuid);
-            entityManager.getTransaction().commit();
-
             Course course = (Course) query.getSingleResult();
 
 
@@ -324,13 +322,11 @@ public class CourseManager {
             Query query = entityManager
                     .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             query.setParameter("uuid", id);
-            entityManager.getTransaction().commit();
+
             return (Course) query.getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        } finally {
-            entityManager.close();
         }
 
 
@@ -351,7 +347,7 @@ public class CourseManager {
 
             entityManager.remove(query.getSingleResult());
             entityManager.getTransaction().commit();
-            return null;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);

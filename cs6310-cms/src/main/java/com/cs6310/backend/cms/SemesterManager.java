@@ -94,8 +94,6 @@ public class SemesterManager {
             e.printStackTrace();
 
             return null;
-        } finally {
-            entityManager.close();
         }
 
     }
