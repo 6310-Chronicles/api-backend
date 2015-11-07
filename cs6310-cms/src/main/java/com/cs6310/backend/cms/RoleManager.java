@@ -3,8 +3,6 @@ package com.cs6310.backend.cms;
 import com.cs6310.backend.helpers.DatabaseUtil;
 import com.cs6310.backend.model.Privilege;
 import com.cs6310.backend.model.Role;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.apache.log4j.Logger;
 
 import javax.persistence.EntityManager;
@@ -31,9 +29,8 @@ public class RoleManager {
      * @param name
      * @return
      */
-    public boolean addRole(String name) {
-        boolean resp = false;
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    public String addRole(String name) {
+
         entityManager.getTransaction().begin();
         try {
 
@@ -44,12 +41,16 @@ public class RoleManager {
 
             entityManager.persist(role);
             entityManager.getTransaction().commit();
-            resp = true;
+
+            return "";
 
         } catch (Exception e) {
+
             e.printStackTrace();
+
+            return DatabaseUtil.getCauseMessage(e);
+
         }
-        return resp;
     }
 
 
@@ -60,32 +61,35 @@ public class RoleManager {
      * @param privilegeUUID
      * @return
      */
-    public boolean addPrivilegeToRole(String roleUUID, String privilegeUUID) {
-        boolean resp = false;
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    public String addPrivilegeToRole(String roleUUID, String privilegeUUID) {
+
         entityManager.getTransaction().begin();
         try {
 
-            Query query = entityManager.createNamedQuery("Role.getByUUID");
+            Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Role.getByUUID");
             query.setParameter("uuid", roleUUID);
             Role role = (Role) query.getSingleResult();
 
 
-            Query queryPrivilege = entityManager.createNamedQuery("Privilege.getByUUID");
+            Query queryPrivilege = entityManager.createNamedQuery("com.cs6310.backend.model.Privilege.getByUUID");
             queryPrivilege.setParameter("uuid", privilegeUUID);
             Privilege privilege = (Privilege) queryPrivilege.getSingleResult();
 
+
             role.getPrivileges().add(privilege);
 
-
             entityManager.merge(role);
-            entityManager.getTransaction().commit();
-            resp = true;
 
+            entityManager.getTransaction().commit();
+
+
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
-        return resp;
     }
 
 
@@ -96,18 +100,17 @@ public class RoleManager {
      * @param privilegeUUID
      * @return
      */
-    public boolean removePrivilegeFromRole(String roleUUID, String privilegeUUID) {
-        boolean resp = false;
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    public String removePrivilegeFromRole(String roleUUID, String privilegeUUID) {
+
         entityManager.getTransaction().begin();
         try {
 
-            Query query = entityManager.createNamedQuery("Role.getByUUID");
+            Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Role.getByUUID");
             query.setParameter("uuid", roleUUID);
             Role role = (Role) query.getSingleResult();
 
 
-            Query queryPrivilege = entityManager.createNamedQuery("Privilege.getByUUID");
+            Query queryPrivilege = entityManager.createNamedQuery("com.cs6310.backend.model.Privilege.getByUUID");
             queryPrivilege.setParameter("uuid", privilegeUUID);
             Privilege privilege = (Privilege) queryPrivilege.getSingleResult();
 
@@ -116,37 +119,42 @@ public class RoleManager {
             for (int t = 0; t < size; t++) {
                 Privilege privilege1 = privilegeList.get(t);
                 if (privilege1.getUuid().equalsIgnoreCase(privilege.getUuid()))
-                    privilegeList.remove(t);
+                    role.getPrivileges().remove(t);
             }
 
-            role.setPrivileges(privilegeList);
+            // role.setPrivileges(privilegeList);
 
             entityManager.merge(role);
             entityManager.getTransaction().commit();
-            resp = true;
+
+            return "OK";
 
         } catch (Exception e) {
             e.printStackTrace();
+
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
-        return resp;
     }
 
+
     /**
-     * Get all persisted roles
+     * Get All persisted roles
      *
      * @return
      */
     public List getAllRoles() {
         entityManager.getTransaction().begin();
-
         Query query = entityManager
-                .createNamedQuery("Role.getAll");
+                .createNamedQuery("com.cs6310.backend.model.Role.getAll");
+        List roleList = query.getResultList();
 
         entityManager.getTransaction().commit();
-        if (query.getResultList() == null) {
-            return null;
+        if (roleList != null) {
+            return roleList;
         } else {
-            return query.getResultList();
+            return null;
         }
     }
 
@@ -154,11 +162,15 @@ public class RoleManager {
     public Role getRole(String uuid) {
         entityManager.getTransaction().begin();
         try {
-            Query query = entityManager.createNamedQuery("Role.getByUUID");
+            Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Role.getByUUID");
             query.setParameter("uuid", uuid);
 
             if (query.getSingleResult() != null) {
-                return (Role) query.getSingleResult();
+                Role role = (Role) query.getSingleResult();
+
+                role.setPrivileges(role.getPrivileges());
+
+                return role;
             } else {
                 return null;
             }
@@ -180,6 +192,39 @@ public class RoleManager {
             e.printStackTrace();
         }
         return resp;
+    }
+
+
+    /**
+     * Delete a Role by passing a uuid
+     *
+     * @return
+     */
+
+    public String deleteRole(String uuid) {
+        entityManager.getTransaction().begin();
+        try {
+            Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Role.getByUUID");
+            query.setParameter("uuid", uuid);
+
+            if (query.getSingleResult() != null) {
+
+                Role role = (Role) query.getSingleResult();
+                entityManager.remove(role);
+                entityManager.getTransaction().commit();
+                return "OK";
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
+        }
+
+
     }
 
 

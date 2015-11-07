@@ -50,6 +50,7 @@ public class TeachingAssistantManager {
             entityManager.getTransaction().begin();
             entityManager.persist(ta);
             entityManager.getTransaction().commit();
+            return "OK";
         } catch (RollbackException e) {
             e.printStackTrace();
 
@@ -62,8 +63,10 @@ public class TeachingAssistantManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
-        return null;
+
     }
 
     /**
@@ -73,16 +76,16 @@ public class TeachingAssistantManager {
      * @param courseUUID
      * @return
      */
-    public boolean addTACompetentCourse(String taUUID, String courseUUID) {
+    public String addTACompetentCourse(String taUUID, String courseUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("TeachingAssistant.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.TeachingAssistant.getByUUID");
             query.setParameter("uuid", taUUID);
             TeachingAssistant teachingAssistant = (TeachingAssistant) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
 
@@ -91,10 +94,12 @@ public class TeachingAssistantManager {
             entityManager.merge(teachingAssistant);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
@@ -107,16 +112,16 @@ public class TeachingAssistantManager {
      * @param courseUUID
      * @return
      */
-    public boolean removeTACompetentCourse(String taUUID, String courseUUID) {
+    public String removeTACompetentCourse(String taUUID, String courseUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("TeachingAssistant.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.TeachingAssistant.getByUUID");
             query.setParameter("uuid", taUUID);
             TeachingAssistant teachingAssistant = (TeachingAssistant) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
 
@@ -132,14 +137,15 @@ public class TeachingAssistantManager {
             entityManager.merge(teachingAssistant);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
-
 
 
     /**
@@ -149,16 +155,16 @@ public class TeachingAssistantManager {
      * @param courseUUID
      * @return
      */
-    public boolean addTAAssistingCourse(String taUUID, String courseUUID) {
+    public String addTAAssistingCourse(String taUUID, String courseUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("TeachingAssistant.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.TeachingAssistant.getByUUID");
             query.setParameter("uuid", taUUID);
             TeachingAssistant teachingAssistant = (TeachingAssistant) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
 
@@ -167,10 +173,12 @@ public class TeachingAssistantManager {
             entityManager.merge(teachingAssistant);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
@@ -183,16 +191,16 @@ public class TeachingAssistantManager {
      * @param courseUUID
      * @return
      */
-    public boolean removeTAAssistingCourse(String taUUID, String courseUUID) {
+    public String removeTAAssistingCourse(String taUUID, String courseUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("TeachingAssistant.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.TeachingAssistant.getByUUID");
             query.setParameter("uuid", taUUID);
             TeachingAssistant teachingAssistant = (TeachingAssistant) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
 
@@ -208,16 +216,15 @@ public class TeachingAssistantManager {
             entityManager.merge(teachingAssistant);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
-
-
-
 
 
     /**
@@ -230,13 +237,86 @@ public class TeachingAssistantManager {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Student.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
             query.setParameter("uuid", id);
             entityManager.getTransaction().commit();
             return (Student) query.getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        } finally {
+            entityManager.close();
+        }
+
+    }
+
+
+    /**
+     * Get All persisted TeachingAssistanta
+     *
+     * @return
+     */
+    public List<TeachingAssistant> getAllTeachingAssistants() {
+        entityManager.getTransaction().begin();
+        Query query = entityManager
+                .createNamedQuery("com.cs6310.backend.model.TeachingAssistant.getAll");
+        entityManager.getTransaction().commit();
+        if (query.getResultList() != null) {
+            return query.getResultList();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get TeachingAssistant by id
+     *
+     * @param uuid
+     * @return
+     */
+    public TeachingAssistant getTeachingAssistant(String uuid) {
+        try {
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.TeachingAssistant.getByUUID");
+            query.setParameter("uuid", uuid);
+            entityManager.getTransaction().commit();
+
+            return (TeachingAssistant) query.getSingleResult();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            entityManager.close();
+        }
+
+    }
+
+
+    /**
+     * Delete TA by UUID
+     *
+     * @param id
+     * @return
+     */
+    public String deleteTAByUUID(String id) {
+        try {
+
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.TeachingAssistant.getByUUID");
+            query.setParameter("uuid", id);
+            entityManager.remove(query.getSingleResult());
+            entityManager.getTransaction().commit();
+
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }

@@ -1,7 +1,6 @@
 package com.cs6310.backend.cms;
 
 import com.cs6310.backend.helpers.DatabaseUtil;
-import com.cs6310.backend.model.Role;
 import com.cs6310.backend.model.Semester;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,8 +29,8 @@ public class SemesterManager {
      * @param name
      * @return
      */
-    public boolean addSemester(String name, String year) {
-        boolean resp = false;
+    public String addSemester(String name, String year) {
+
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         entityManager.getTransaction().begin();
         try {
@@ -43,12 +42,17 @@ public class SemesterManager {
 
             entityManager.persist(semester);
             entityManager.getTransaction().commit();
-            resp = true;
+            return null;
 
         } catch (Exception e) {
             e.printStackTrace();
+
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
-        return resp;
+
+
     }
 
 
@@ -61,7 +65,7 @@ public class SemesterManager {
         entityManager.getTransaction().begin();
 
         Query query = entityManager
-                .createNamedQuery("Semester.getAll");
+                .createNamedQuery("com.cs6310.backend.model.Semester.getAll");
 
         entityManager.getTransaction().commit();
         if (query.getResultList() == null) {
@@ -72,21 +76,55 @@ public class SemesterManager {
     }
 
 
-    public Role getSemester(String uuid) {
+    public Semester getSemester(String uuid) {
         entityManager.getTransaction().begin();
         try {
-            Query query = entityManager.createNamedQuery("Semester.getByUUID");
+            Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Semester.getByUUID");
             query.setParameter("uuid", uuid);
 
-            if (query.getSingleResult() != null) {
-                return (Role) query.getSingleResult();
+            Semester semester = (Semester) query.getSingleResult();
+
+
+            if (semester != null) {
+                return semester;
             } else {
                 return null;
             }
         } catch (Exception e) {
             e.printStackTrace();
+
             return null;
+        } finally {
+            entityManager.close();
         }
+
+    }
+
+    public String removeSemester(String uuid) {
+        entityManager.getTransaction().begin();
+        try {
+            Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Semester.getByUUID");
+            query.setParameter("uuid", uuid);
+
+            if (query.getSingleResult() != null) {
+
+                Semester semester = (Semester) query.getSingleResult();
+                entityManager.remove(semester);
+                entityManager.getTransaction().commit();
+                return null;
+
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return DatabaseUtil.getCauseMessage(e);
+
+        } finally {
+            entityManager.close();
+        }
+
     }
 
 
@@ -101,7 +139,10 @@ public class SemesterManager {
             entityManager.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            entityManager.close();
         }
+
         return resp;
     }
 

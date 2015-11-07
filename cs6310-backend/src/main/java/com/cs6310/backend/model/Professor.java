@@ -11,11 +11,12 @@ import java.util.List;
  * Created by nelson on 11/3/15.
  */
 @Entity
+@Table(name = "professor")
 public class Professor  implements Serializable {
 
 
     private static final long serialVersionUID = 1L;
-    @Expose
+
     @Id
     @GeneratedValue
     private int id;
@@ -24,28 +25,31 @@ public class Professor  implements Serializable {
     @Column(unique = true)
     private String uuid;
 
-
     @Expose
     private boolean available;
+
 
     @Expose
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private PersonDetails personDetails;
 
-
     @Expose
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private AccessCredential accessCredential;
 
 
     @Expose
-    @ManyToMany(targetEntity = Course.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "competent")
-    private List<Course> competentCourseList;
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,})
+    private List<Course> competentCourseList = new ArrayList<>();
 
 
     @Expose
-    @ManyToMany(targetEntity = Course.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "offering")
-    private List<Course> teachingCourseList;
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,})
+    private List<Course> teachingCourseList = new ArrayList<>();
+
+
+
+
 
 
     public boolean isAvailable() {

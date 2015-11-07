@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,16 +12,17 @@ import java.util.List;
  */
 @Cacheable
 @NamedQueries({
-        @NamedQuery(name = "Role.getAll", query = "select obj from Role obj"),
-        @NamedQuery(name = "Role.getByUUID", query = "select obj from Role obj where obj.uuid = :uuid"),
-        @NamedQuery(name = "Role.getByName", query = "select obj from Role obj where obj.name = :name")
+        @NamedQuery(name = "com.cs6310.backend.model.Role.getAll", query = "select obj from Role obj"),
+        @NamedQuery(name = "com.cs6310.backend.model.Role.getByUUID", query = "select obj from Role obj where obj.uuid = :uuid"),
+        @NamedQuery(name = "com.cs6310.backend.model.Role.getByName", query = "select obj from Role obj where obj.name = :name")
 })
 @Entity
+@Table(name = "role")
 public class Role implements Serializable {
 
 
     private static final long serialVersionUID = 1L;
-    @Expose
+
     @Id
     @GeneratedValue
     private int id;
@@ -33,22 +35,28 @@ public class Role implements Serializable {
     @Column(unique = true)
     private String name;
 
-    @ManyToMany(targetEntity = Administrator.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Administrator.class,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "roles")
     private List<Administrator> administrator;
 
+    @Expose
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Privilege.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<Privilege> privileges = new ArrayList<>();
 
-    @ManyToMany(targetEntity=Privilege.class, cascade={CascadeType.PERSIST, CascadeType.MERGE}, fetch=FetchType.EAGER)
-    private List<Privilege> privileges;
+
+    public Role() {
+    }
 
     public List<Privilege> getPrivileges() {
+
+        if (privileges == null)
+            privileges = new ArrayList<>();
+
         return privileges;
     }
 
     public void setPrivileges(List<Privilege> privileges) {
         this.privileges = privileges;
-    }
-
-    public Role() {
     }
 
     public int getId() {
@@ -76,6 +84,11 @@ public class Role implements Serializable {
     }
 
     public List<Administrator> getAdministrator() {
+
+
+        if (administrator == null)
+            administrator = new ArrayList<>();
+
         return administrator;
     }
 

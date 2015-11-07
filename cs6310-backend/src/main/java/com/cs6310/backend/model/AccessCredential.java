@@ -12,17 +12,18 @@ import java.io.Serializable;
 
 @Cacheable
 @NamedQueries({
-        @NamedQuery(name = "AccessCredential.findByUsername",
+        @NamedQuery(name = "com.cs6310.backend.model.AccessCredential.findByUsername",
                 query = "select obj from AccessCredential obj where obj.username = :username"),
 })
 @Entity
+@Table(name = "accesscredential")
 public class AccessCredential implements Serializable {
 
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-    @Expose
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;

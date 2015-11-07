@@ -13,16 +13,16 @@ import java.util.List;
 
 @Cacheable
 @NamedQueries({
-        @NamedQuery(name = "Course.getAll", query = "select obj from Course obj"),
-        @NamedQuery(name = "Course.getByUUID", query = "select obj from Course obj where obj.uuid = :uuid"),
-        @NamedQuery(name = "Course.getByName", query = "select obj from Course obj where obj.name = :name")
+        @NamedQuery(name = "com.cs6310.backend.model.Course.getAll", query = "select obj from Course obj"),
+        @NamedQuery(name = "com.cs6310.backend.model.Course.getByUUID", query = "select obj from Course obj where obj.uuid = :uuid"),
+        @NamedQuery(name = "com.cs6310.backend.model.Course.getByName", query = "select obj from Course obj where obj.name = :name")
 })
 @Entity
+@Table(name = "course")
 public class Course implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Expose
     @Id
     @GeneratedValue
     private int id;
@@ -44,6 +44,8 @@ public class Course implements Serializable {
     @Expose
     private Integer courseName;
 
+    @Expose
+    private Integer priority;
 
     @Expose
     private Integer courseCredits;
@@ -55,44 +57,46 @@ public class Course implements Serializable {
     private Integer currentEnrollment;
 
     @Expose
-    private List<Course> listOfPrerequisiteCourses;
+    private List<String> listOfPrerequisiteCourses;
 
     @Expose
-    @ManyToMany(targetEntity = Semester.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "course")
-    private List<Semester> offeredInSemester;
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Semester.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    private List<Semester> offeredInSemester = new ArrayList<>();
 
 
-    @ManyToMany(targetEntity = Student.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Student> studentCompleted;
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Professor.class,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "competentCourseList")
+    private List<Professor> professorCompetency = new ArrayList<>();
 
-    @ManyToMany(targetEntity = Student.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Student> studentRecommendation;
-
-
-    @ManyToMany(targetEntity = Student.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Student> studentProgress;
-
-    @ManyToMany(targetEntity = Student.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Student> studentsOptimized;
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Professor.class,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "teachingCourseList")
+    private List<Professor> professorsTeaching = new ArrayList<>();
 
 
-    @ManyToMany(targetEntity = Professor.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Professor> competent;
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Student.class,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "completedCourses")
+    private List<Student> studentCompleted = new ArrayList<>();
+
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Student.class,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "recommendedCourses")
+    private List<Student> studentRecommended = new ArrayList<>();
 
 
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Student.class,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "coursesInProgress")
+    private List<Student> studentProgress = new ArrayList<>();
 
-    @ManyToMany(targetEntity = Professor.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Professor> offering;
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Student.class,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "preferedCoursesToBeOptimized")
+    private List<Student> studentPreferred = new ArrayList<>();
 
+    @ManyToMany(targetEntity = com.cs6310.backend.model.TeachingAssistant.class,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "competency")
+    private List<TeachingAssistant> teachingAssistantCompetency = new ArrayList<>();
 
-
-    @ManyToMany(targetEntity = Professor.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Professor> competency;
-
-
-
-    @ManyToMany(targetEntity = Professor.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Professor> assisting;
+    @ManyToMany(targetEntity = com.cs6310.backend.model.TeachingAssistant.class,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "assisting")
+    private List<TeachingAssistant> teachingAssistantAssisting = new ArrayList<>();
 
 
     public String getUuid() {
@@ -159,23 +163,31 @@ public class Course implements Serializable {
         this.currentEnrollment = currentEnrollment;
     }
 
-    public List<Course> getListOfPrerequisiteCourses() {
-        if (listOfPrerequisiteCourses==null)
-            listOfPrerequisiteCourses= new ArrayList<>();
+    public List<String> getListOfPrerequisiteCourses() {
+        if (listOfPrerequisiteCourses == null)
+            listOfPrerequisiteCourses = new ArrayList<>();
         return listOfPrerequisiteCourses;
     }
 
-    public void setListOfPrerequisiteCourses(List<Course> listOfPrerequisiteCourses) {
+    public void setListOfPrerequisiteCourses(List<String> listOfPrerequisiteCourses) {
         this.listOfPrerequisiteCourses = listOfPrerequisiteCourses;
     }
 
     public List<Semester> getOfferedInSemester() {
-        if (offeredInSemester==null)
-            offeredInSemester= new ArrayList<>();
+        if (offeredInSemester == null)
+            offeredInSemester = new ArrayList<>();
         return offeredInSemester;
     }
 
     public void setOfferedInSemester(List<Semester> offeredInSemester) {
         this.offeredInSemester = offeredInSemester;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
     }
 }

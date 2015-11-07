@@ -2,7 +2,6 @@ package com.cs6310.backend.cms;
 
 import com.cs6310.backend.helpers.DatabaseUtil;
 import com.cs6310.backend.model.AccessCredential;
-import com.cs6310.backend.model.Student;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -28,9 +27,9 @@ public class AuthenticatorManager {
      * @param password
      * @return
      */
-    public Student authenticateStudent(String username, String password) {
+    public Object authenticate(String username, String password) {
         Query q = entityManager
-                .createNamedQuery("AccessCredential.findByUsername");
+                .createNamedQuery("com.cs6310.backend.model.AccessCredential.findByUsername");
         q.setParameter("username", username);
 
         if (q.getResultList() == null || q.getResultList().size() <= 0) {
@@ -48,12 +47,12 @@ public class AuthenticatorManager {
                     System.out.println(gson.toJson(accessCredential));
 
                     Query query = entityManager
-                            .createNamedQuery("Student.findByCredentials");
+                            .createNamedQuery("com.cs6310.backend.model.Student.findByCredentials");
                     query.setParameter("accessCredential", accessCredential);
 
-                    Student student = (Student) query.getSingleResult();
-                    if (student != null) {
-                        return student;
+                    Object object = query.getSingleResult();
+                    if (object != null) {
+                        return object;
                     }
 
                 } else {

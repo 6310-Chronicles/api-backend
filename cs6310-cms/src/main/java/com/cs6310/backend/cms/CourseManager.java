@@ -1,6 +1,7 @@
 package com.cs6310.backend.cms;
 
 import com.cs6310.backend.helpers.DatabaseUtil;
+import com.cs6310.backend.helpers.Utils;
 import com.cs6310.backend.model.Course;
 import com.cs6310.backend.model.Semester;
 import com.google.gson.Gson;
@@ -25,7 +26,6 @@ public class CourseManager {
         logger = Logger.getLogger(AdministratorManager.class);
     }
 
-
     /**
      * Add new Course details
      *
@@ -38,8 +38,8 @@ public class CourseManager {
      * @param currentEnrollment
      * @return
      */
-    public boolean addCourse(String courseId, boolean hasPrerequisite, boolean mustBeOffered, Integer courseName, Integer courseCredits, Integer maximumEnrollment,
-                             Integer currentEnrollment) {
+    public String addCourse(String courseId, String hasPrerequisite, String mustBeOffered, String courseName, String courseCredits, String maximumEnrollment,
+                            String currentEnrollment, String priority) {
         boolean resp = false;
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         entityManager.getTransaction().begin();
@@ -47,23 +47,32 @@ public class CourseManager {
 
             Course course = new Course();
             course.setCourseId(courseId);
-            course.setHasPrerequisite(hasPrerequisite);
-            course.setMustBeOffered(mustBeOffered);
-            course.setCourseName(courseName);
-            course.setCourseCredits(courseCredits);
-            course.setMaximumEnrollment(maximumEnrollment);
-            course.setCurrentEnrollment(currentEnrollment);
-
+            course.setHasPrerequisite(Utils.convertStringToBool(hasPrerequisite));
+            course.setMustBeOffered(Utils.convertStringToBool(mustBeOffered));
+//            course.setCourseName(Utils. convertIntegerToString(courseName));
+            course.setCourseName(00345);
+            course.setCourseCredits(Utils.convertIntegerToString(courseCredits));
+            course.setMaximumEnrollment(Utils.convertIntegerToString(maximumEnrollment));
+            course.setCurrentEnrollment(Utils.convertIntegerToString(currentEnrollment));
+            course.setPriority(Utils.convertIntegerToString(priority));
             course.setUuid(String.valueOf(UUID.randomUUID()));
 
             entityManager.persist(course);
+
             entityManager.getTransaction().commit();
-            resp = true;
+
 
         } catch (Exception e) {
             e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+
+        } finally {
+            entityManager.close();
         }
-        return resp;
+
+
+        return null;
+
     }
 
 
@@ -79,36 +88,48 @@ public class CourseManager {
      * @param currentEnrollment
      * @return
      */
-    public boolean updateCourse(String courseId, Boolean hasPrerequisite, Boolean mustBeOffered, Integer courseName, Integer courseCredits, Integer maximumEnrollment,
-                                Integer currentEnrollment) {
-        boolean resp = false;
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    public String updateCourse(String uuid, String courseId, String hasPrerequisite, String mustBeOffered, String courseName, String courseCredits, String maximumEnrollment,
+                               String currentEnrollment, String priority) {
+
         entityManager.getTransaction().begin();
         try {
 
-            Course course = getCourseByUUID(courseId);
+
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
+            query.setParameter("uuid", uuid);
+            entityManager.getTransaction().commit();
+
+            Course course = (Course) query.getSingleResult();
+
+
             if (hasPrerequisite != null)
-                course.setHasPrerequisite(hasPrerequisite);
+                course.setHasPrerequisite(Utils.convertStringToBool(hasPrerequisite));
             if (mustBeOffered != null)
-                course.setMustBeOffered(mustBeOffered);
+                course.setMustBeOffered(Utils.convertStringToBool(mustBeOffered));
             if (courseName != null)
-                course.setCourseName(courseName);
+                course.setCourseName(Utils.convertIntegerToString(courseName));
             if (courseCredits != null)
-                course.setCourseCredits(courseCredits);
+                course.setCourseCredits(Utils.convertIntegerToString(courseCredits));
             if (maximumEnrollment != null)
-                course.setMaximumEnrollment(maximumEnrollment);
+                course.setMaximumEnrollment(Utils.convertIntegerToString(maximumEnrollment));
             if (currentEnrollment != null)
-                course.setCurrentEnrollment(currentEnrollment);
+                course.setCurrentEnrollment(Utils.convertIntegerToString(currentEnrollment));
+            if (priority != null)
+                course.setPriority(Utils.convertIntegerToString(priority));
 
 
             entityManager.merge(course);
             entityManager.getTransaction().commit();
-            resp = true;
+            return "OK";
 
         } catch (Exception e) {
             e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
-        return resp;
+
     }
 
 
@@ -119,30 +140,34 @@ public class CourseManager {
      * @param courseUUID2
      * @return
      */
-    public boolean addPrerequisiteToCourse(String courseUUID1, String courseUUID2) {
+    public String addPrerequisiteToCourse(String courseUUID1, String courseUUID2) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             query.setParameter("uuid", courseUUID1);
+
             Course course = (Course) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID2);
             Course course2 = (Course) querycourse.getSingleResult();
 
-            course.getListOfPrerequisiteCourses().add(course2);
+            course.getListOfPrerequisiteCourses().add(course2.getUuid());
 
 
             entityManager.merge(course);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
+
 
     }
 
@@ -154,39 +179,44 @@ public class CourseManager {
      * @param courseUUID2
      * @return
      */
-    public boolean removePrerequisiteToCourse(String courseUUID1, String courseUUID2) {
+    public String removePrerequisiteToCourse(String courseUUID1, String courseUUID2) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             query.setParameter("uuid", courseUUID1);
             Course course = (Course) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID2);
             Course course2 = (Course) querycourse.getSingleResult();
 
-            course.getListOfPrerequisiteCourses().add(course2);
+            course.getListOfPrerequisiteCourses().add(course2.getUuid());
 
-
-            List<Course> courseList = course.getListOfPrerequisiteCourses();
+            List<String> courseList = course.getListOfPrerequisiteCourses();
             int size = courseList.size();
 
             for (int t = 0; t < size; t++) {
-                Course course1 = courseList.get(t);
+
+                Course course1 = getCourseByUUID(courseList.get(t));// ;
+
+
                 if (course1.getUuid().equalsIgnoreCase(course.getUuid()))
-                    courseList.remove(t);
+                    course.getListOfPrerequisiteCourses().remove(t);
             }
             course.setListOfPrerequisiteCourses(courseList);
             entityManager.merge(course);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
+
 
     }
 
@@ -198,29 +228,41 @@ public class CourseManager {
      * @param semesterUUID
      * @return
      */
-    public boolean setCourseSemester(String courseUUID, String semesterUUID) {
+    public String setCourseSemester(String courseUUID, String semesterUUID) {
         try {
+
+//            Semester semester =  getSemester (semesterUUID);
+//
+//            Course course =getCourseByUUID(courseUUID);
+
             entityManager.getTransaction().begin();
             Query query = entityManager
                     .createNamedQuery("Course.getByUUID");
             query.setParameter("uuid", courseUUID);
             Course course = (Course) query.getSingleResult();
 
+
             Query querycourse = entityManager
                     .createNamedQuery("Semester.getByUUID");
             querycourse.setParameter("uuid", semesterUUID);
+
             Semester semester = (Semester) querycourse.getSingleResult();
+
 
             course.getOfferedInSemester().add(semester);
 
             entityManager.merge(course);
+
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
+
 
     }
 
@@ -232,16 +274,16 @@ public class CourseManager {
      * @param semesterUUID
      * @return
      */
-    public boolean removeCourseSemester(String courseUUID, String semesterUUID) {
+    public String removeCourseSemester(String courseUUID, String semesterUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             query.setParameter("uuid", courseUUID);
             Course course = (Course) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Semester.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Semester.getByUUID");
             querycourse.setParameter("uuid", semesterUUID);
             Semester semester = (Semester) querycourse.getSingleResult();
 
@@ -259,16 +301,19 @@ public class CourseManager {
             entityManager.merge(course);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
+
 
     }
 
     /**
-     * Get student by UUID
+     * Get Course by UUID
      *
      * @param id
      * @return
@@ -277,15 +322,62 @@ public class CourseManager {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             query.setParameter("uuid", id);
             entityManager.getTransaction().commit();
             return (Course) query.getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        } finally {
+            entityManager.close();
         }
 
+
     }
+
+    /**
+     * Delete Course by UUID
+     *
+     * @param id
+     * @return
+     */
+    public String deleteCourseByUUID(String id) {
+        try {
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
+            query.setParameter("uuid", id);
+
+            entityManager.remove(query.getSingleResult());
+            entityManager.getTransaction().commit();
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
+        }
+
+
+    }
+
+    /**
+     * Get All persisted users
+     *
+     * @return
+     */
+    public List<Course> getAll() {
+        entityManager.getTransaction().begin();
+        Query query = entityManager
+                .createNamedQuery("com.cs6310.backend.model.Course.getAll");
+        entityManager.getTransaction().commit();
+        if (query.getResultList() != null) {
+            return query.getResultList();
+        } else {
+            return null;
+        }
+    }
+
 
 }

@@ -5,9 +5,7 @@ import com.google.gson.annotations.Expose;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by nelson on 10/14/15.
@@ -15,27 +13,25 @@ import java.util.Set;
 
 @Cacheable
 @NamedQueries({
-        @NamedQuery(name = "Administrator.findByCredentials",
+        @NamedQuery(name = "com.cs6310.backend.model.Administrator.findByCredentials",
                 query = "select obj from Administrator obj where obj.accessCredential = : accessCredential"),
-        @NamedQuery(name = "Administrator.getAll", query = "select obj from Administrator obj"),
-        @NamedQuery(name = "Administrator.getById", query = "select obj from Administrator obj where obj.id = :id"),
-        @NamedQuery(name = "Administrator.getByUUID",
+        @NamedQuery(name = "com.cs6310.backend.model.Administrator.getAll", query = "select obj from Administrator obj"),
+        @NamedQuery(name = "com.cs6310.backend.model.Administrator.getById", query = "select obj from Administrator obj where obj.id = :id"),
+        @NamedQuery(name = "com.cs6310.backend.model.Administrator.getByUUID",
                 query = "select obj from Administrator obj where obj.uuid =: uuid"),
-        @NamedQuery(name = "Administrator.getByPersonalDetails",
+        @NamedQuery(name = "com.cs6310.backend.model.Administrator.getByPersonalDetails",
                 query = "select obj from Administrator obj where obj.personDetails =: personalDetails")
 
 })
 
 @Entity
+@Table(name = "administrator")
 public class Administrator implements Serializable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
 
 
-    @Expose
+
     @Id
     @GeneratedValue
     private int id;
@@ -48,16 +44,19 @@ public class Administrator implements Serializable {
     @Column
     private String administratorId;
 
+
     @Expose
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private PersonDetails personDetails;
 
-    @Expose
-    @ManyToMany(targetEntity = Role.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "administrator")
-    private List<Role> roles;
 
     @Expose
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Role.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    private List<Role> roles = new ArrayList<>();
+
+
+    @Expose
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private AccessCredential accessCredential;
 
 
@@ -78,13 +77,17 @@ public class Administrator implements Serializable {
     }
 
     public List<Role> getRoles() {
-        Set<Role> roleSet = new HashSet<Role>(roles);
-        return new ArrayList<Role>(roleSet);
+
+        if (roles == null)
+            roles = new ArrayList<>();
+
+        return roles;
     }
 
     public void setRoles(List<Role> roles) {
-        Set<Role> roleSet = new HashSet<Role>(roles);
-        this.roles = new ArrayList<Role>(roleSet);
+
+
+        this.roles = roles;
     }
 
     public AccessCredential getAccessCredential() {

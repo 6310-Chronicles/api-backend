@@ -1,7 +1,11 @@
 package com.cs6310.backend.cms;
 
 import com.cs6310.backend.helpers.DatabaseUtil;
-import com.cs6310.backend.model.*;
+import com.cs6310.backend.helpers.Utils;
+import com.cs6310.backend.model.AccessCredential;
+import com.cs6310.backend.model.Administrator;
+import com.cs6310.backend.model.PersonDetails;
+import com.cs6310.backend.model.Role;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.log4j.Logger;
@@ -44,7 +48,7 @@ public class AdministratorManager {
 
     public String addAdministrator(String administratorId, String firstName, String lastName, String profilePic,
                                    String mobilePhone, String email, String gender, String address, String username, String password, String secretQuestion,
-                                   String secretAnswer, boolean active) {
+                                   String secretAnswer, String active) {
 
 
         Administrator administrator = new Administrator();
@@ -70,7 +74,7 @@ public class AdministratorManager {
         accessCredential.setPassword(password);
         accessCredential.setSecretQuestion(secretQuestion);
         accessCredential.setSecretAnswer(secretAnswer);
-        accessCredential.setActive(active);
+        accessCredential.setActive(Utils.convertStringToBool(active));
 
         administrator.setAccessCredential(accessCredential);
 
@@ -92,7 +96,7 @@ public class AdministratorManager {
 
             return DatabaseUtil.getCauseMessage(e);
         }
-        return null;
+        return "OK";
     }
 
 
@@ -117,13 +121,14 @@ public class AdministratorManager {
 
     public String updateAdministrator(String administratorId, String firstName, String lastName, String profilePic,
                                       String mobilePhone, String email, String gender, String address, String username, String password, String secretQuestion,
-                                      String secretAnswer, boolean active) {
+                                      String secretAnswer, String active) {
 
         Administrator administrator = null;
+
         entityManager.getTransaction().begin();
         try {
 
-            Query query = entityManager.createNamedQuery("Administrator.getByUUID");
+            Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Administrator.getByUUID");
             query.setParameter("uuid", administratorId);
             administrator = (Administrator) query.getSingleResult();
 
@@ -154,6 +159,7 @@ public class AdministratorManager {
                 personDetails.setProfilePic(profilePic);
 
 
+
             administrator.setPersonDetails(personDetails);
 
 
@@ -167,6 +173,8 @@ public class AdministratorManager {
                 accessCredential.setSecretQuestion(secretQuestion);
             if (secretAnswer != null)
                 accessCredential.setSecretAnswer(secretAnswer);
+            if (active != null)
+                accessCredential.setActive(Utils.convertStringToBool(active));
 
 
             administrator.setAccessCredential(accessCredential);
@@ -191,7 +199,7 @@ public class AdministratorManager {
             }
 
         }
-        return null;
+        return "OK";
     }
 
 
@@ -207,18 +215,18 @@ public class AdministratorManager {
      * @param roleUUID
      * @return
      */
-    public boolean addRoleToAdministrator(String adminUUID, String roleUUID) {
+    public String addRoleToAdministrator(String adminUUID, String roleUUID) {
         boolean resp = false;
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         entityManager.getTransaction().begin();
         try {
 
-            Query query = entityManager.createNamedQuery("Administrator.getByUUID");
+            Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Administrator.getByUUID");
             query.setParameter("uuid", adminUUID);
             Administrator administrator = (Administrator) query.getSingleResult();
 
 
-            Query queryPrivilege = entityManager.createNamedQuery("Role.getByUUID");
+            Query queryPrivilege = entityManager.createNamedQuery("com.cs6310.backend.model.Role.getByUUID");
             queryPrivilege.setParameter("uuid", roleUUID);
             Role role = (Role) queryPrivilege.getSingleResult();
 
@@ -227,10 +235,13 @@ public class AdministratorManager {
             entityManager.getTransaction().commit();
             resp = true;
 
+            return "OK";
+
         } catch (Exception e) {
             e.printStackTrace();
+
+            return DatabaseUtil.getCauseMessage(e);
         }
-        return resp;
     }
 
 
@@ -241,18 +252,18 @@ public class AdministratorManager {
      * @param roleUUID
      * @return
      */
-    public boolean removeRoleFromAdministrator(String adminUUID, String roleUUID) {
+    public String removeRoleFromAdministrator(String adminUUID, String roleUUID) {
         boolean resp = false;
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         entityManager.getTransaction().begin();
         try {
 
-            Query query = entityManager.createNamedQuery("Administrator.getByUUID");
+            Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Administrator.getByUUID");
             query.setParameter("uuid", adminUUID);
             Administrator administrator = (Administrator) query.getSingleResult();
 
 
-            Query queryPrivilege = entityManager.createNamedQuery("Role.getByUUID");
+            Query queryPrivilege = entityManager.createNamedQuery("com.cs6310.backend.model.Role.getByUUID");
             queryPrivilege.setParameter("uuid", roleUUID);
             Role role = (Role) queryPrivilege.getSingleResult();
 
@@ -262,7 +273,7 @@ public class AdministratorManager {
             for (int t = 0; t < size; t++) {
                 Role role1 = roleList.get(t);
                 if (role1.getUuid().equalsIgnoreCase(role.getUuid()))
-                    roleList.remove(t);
+                    administrator.getRoles().remove(t);
             }
 
             entityManager.merge(administrator);
@@ -271,8 +282,10 @@ public class AdministratorManager {
 
         } catch (Exception e) {
             e.printStackTrace();
+
+            return DatabaseUtil.getCauseMessage(e);
         }
-        return resp;
+        return "OK";
     }
 
 
@@ -284,7 +297,7 @@ public class AdministratorManager {
     public List<Administrator> getAllAdminstrators() {
         entityManager.getTransaction().begin();
         Query query = entityManager
-                .createNamedQuery("Administrator.getAll");
+                .createNamedQuery("com.cs6310.backend.model.Administrator.getAll");
         entityManager.getTransaction().commit();
         if (query.getResultList() != null) {
             return query.getResultList();
@@ -303,7 +316,7 @@ public class AdministratorManager {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Administrator.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Administrator.getByUUID");
             query.setParameter("uuid", uuid);
             entityManager.getTransaction().commit();
 
@@ -316,6 +329,33 @@ public class AdministratorManager {
         }
 
     }
+
+
+    /**
+     * Delete Administrator by UUID
+     *
+     * @param id
+     * @return
+     */
+    public String deleteAdministratorByUUID(String id) {
+        try {
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Administrator.getByUUID");
+            query.setParameter("uuid", id);
+
+            entityManager.remove(query.getSingleResult());
+            entityManager.getTransaction().commit();
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        }
+
+    }
+
+
+
 
 
 }

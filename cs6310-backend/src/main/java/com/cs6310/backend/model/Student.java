@@ -13,15 +13,16 @@ import java.util.List;
 
 @Cacheable
 @NamedQueries({
-        @NamedQuery(name = "Student.findByCredentials", query = "select obj from Student obj where obj.accessCredential = : accessCredential"),
-        @NamedQuery(name = "Student.getAll", query = "select obj from Student obj"),
-        @NamedQuery(name = "Student.getByStudentId", query = "select obj from Student obj where obj.studentId = :studentId"),
-        @NamedQuery(name = "Student.getByUUID",query = "select obj from Student obj where obj.uuid =: uuid"),
-        @NamedQuery(name = "Student.getByPersonalDetails", query = "select obj from Student obj where obj.personDetails =: personalDetails")
+        @NamedQuery(name = "com.cs6310.backend.model.Student.findByCredentials", query = "select obj from Student obj where obj.accessCredential = : accessCredential"),
+        @NamedQuery(name = "com.cs6310.backend.model.Student.getAll", query = "select obj from Student obj"),
+        @NamedQuery(name = "com.cs6310.backend.model.Student.getByStudentId", query = "select obj from Student obj where obj.studentId = :studentId"),
+        @NamedQuery(name = "com.cs6310.backend.model.Student.getByUUID", query = "select obj from Student obj where obj.uuid =: uuid"),
+        @NamedQuery(name = "com.cs6310.backend.model.Student.getByPersonalDetails", query = "select obj from Student obj where obj.personDetails =: personalDetails")
 
 })
 
 @Entity
+@Table(name = "student")
 public class Student implements Serializable {
 
     /**
@@ -30,7 +31,6 @@ public class Student implements Serializable {
     private static final long serialVersionUID = 1L;
 
 
-    @Expose
     @Id
     @GeneratedValue
     private int id;
@@ -51,33 +51,35 @@ public class Student implements Serializable {
     @Column
     private Integer maxCourses;
 
-    @Expose
-    @ManyToMany(targetEntity = Course.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "studentCompleted")
-    private List<Course> completedCourses;
-
-    @Expose
-    @ManyToMany(targetEntity = Course.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "studentRecommendation")
-    private List<Course> recommendedCourses;
-
-
-    @Expose
-    @ManyToMany(targetEntity = Course.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "studentProgress")
-    private List<Course> coursesInProgress;
-
-
-    @Expose
-    @ManyToMany(targetEntity = Course.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "studentsOptimized")
-    private List<Course> prefferedCoursesToBeOptimized;
-
-
 
     @Expose
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private PersonDetails personDetails;
 
     @Expose
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private AccessCredential accessCredential;
+
+
+
+    @Expose
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,})
+    private List<Course> completedCourses = new ArrayList<>();
+
+
+    @Expose
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,})
+    private List<Course> recommendedCourses = new ArrayList<>();
+
+
+    @Expose
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,})
+    private List<Course> coursesInProgress = new ArrayList<>();
+
+    @Expose
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,})
+    private List<Course> preferedCoursesToBeOptimized = new ArrayList<>();
+
 
     public int getId() {
         return id;
@@ -170,13 +172,13 @@ public class Student implements Serializable {
         this.coursesInProgress = coursesInProgress;
     }
 
-    public List<Course> getPrefferedCoursesToBeOptimized() {
-        if (prefferedCoursesToBeOptimized==null)
-            prefferedCoursesToBeOptimized =  new ArrayList<>();
-        return prefferedCoursesToBeOptimized;
+    public List<Course> getPreferedCoursesToBeOptimized() {
+        if (preferedCoursesToBeOptimized == null)
+            preferedCoursesToBeOptimized = new ArrayList<>();
+        return preferedCoursesToBeOptimized;
     }
 
-    public void setPrefferedCoursesToBeOptimized(List<Course> prefferedCoursesToBeOptimized) {
-        this.prefferedCoursesToBeOptimized = prefferedCoursesToBeOptimized;
+    public void setPreferedCoursesToBeOptimized(List<Course> preferedCoursesToBeOptimized) {
+        this.preferedCoursesToBeOptimized = preferedCoursesToBeOptimized;
     }
 }

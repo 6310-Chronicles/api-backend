@@ -5,17 +5,21 @@
 
     <persistence-unit name="PU">
 
-        <jta-data-source>jdbc/aquifer-DB</jta-data-source>
-
-        <class>com.cs6310.backend.model.Role</class>
+        <jta-data-source>jdbc/cs6310</jta-data-source>
         <class>com.cs6310.backend.model.AccessCredential</class>
-        <class>com.cs6310.backend.model.Student</class>
+        <class>com.cs6310.backend.model.Administrator</class>
+        <class>com.cs6310.backend.model.Course</class>
         <class>com.cs6310.backend.model.PersonDetails</class>
-        <class>com.cs6310.backend.model.Permit</class>
+        <class>com.cs6310.backend.model.Privilege</class>
+        <class>com.cs6310.backend.model.Professor</class>
+        <class>com.cs6310.backend.model.Role</class>
+        <class>com.cs6310.backend.model.Semester</class>
+        <class>com.cs6310.backend.model.Student</class>
+        <class>com.cs6310.backend.model.TeachingAssistant</class>
+
 
         <properties>
-            <!-- <property name="openjpa.jdbc.Schema" value="aquifer-database0002"/> -->
-            <!--<property name="openjpa.jdbc.Schema" value="aquifer-database-p02"/>-->
+            <!--<property name="openjpa.jdbc.Schema" value="cs6310-database-p03"/>-->
             <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true,schemaAction='add')"/>
             <property name="openjpa.jdbc.UpdateManager" value="operation-order"/>
             <property name="openjpa.jdbc.TransactionIsolation" value="read-committed"/>
@@ -26,8 +30,7 @@
             <property name="openjpa.DynamicEnhancementAgent" value="true"/>
             <property name="RuntimeUnenhancedClasses" value="supported"/>
             <!--<property name="openjpa.RuntimeUnenhancedClasses" value="unsupported"/>-->
-
-            <!-- <property name="openjpa.ConnectionDriverName" value="com.ibm.db2.jcc.DB2Driver"/> -->
+            <!--<property name="openjpa.ConnectionDriverName" value="com.ibm.db2.jcc.DB2Driver"/>-->
 
         </properties>
     </persistence-unit>

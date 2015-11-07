@@ -1,7 +1,7 @@
 package com.cs6310.backend.api;
 
-import com.cs6310.backend.cms.AdministratorManager;
-import com.cs6310.backend.model.Administrator;
+import com.cs6310.backend.cms.TeachingAssistantManager;
+import com.cs6310.backend.model.TeachingAssistant;
 import com.cs6310.backend.response.APIResponse;
 import com.cs6310.backend.response.ResponseStatus;
 import com.google.gson.Gson;
@@ -13,33 +13,20 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-@Path("/administrator")
-public class AdminstratorAPI {
+@Path("/teachingAssistant")
+public class TeachingAssistantAPI {
 
 
     @POST
     @Path("/create")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
     public Response create(
-            @FormParam("administratorId") String administratorId,
-            @FormParam("lastName") String lastName,
-            @FormParam("firstName") String firstName,
-            @FormParam("mobilePhone") String mobilePhone,
-            @FormParam("email") String email,
-            @FormParam("gender") String gender,
-            @FormParam("address") String address,
-            @FormParam("userName") String userName,
-            @FormParam("password") String password,
-            @FormParam("secretQuestion") String secretQuestion,
-            @FormParam("secretAnswer") String secretAnswer,
-            @FormParam("active") String active) {
+            @FormParam("studentId") String studentId) {
 
 
-        AdministratorManager administratorManager = new AdministratorManager();
+        TeachingAssistantManager teachingAssistantManager = new TeachingAssistantManager();
 
-        String error = administratorManager.addAdministrator(administratorId, firstName, lastName, "",
-                mobilePhone, email, gender, address, userName, password, secretQuestion,
-                secretAnswer, active);
+        String error = teachingAssistantManager.addTeachingAssistant(studentId);
 
         APIResponse payload = new APIResponse();
         if (error == null) {
@@ -58,55 +45,37 @@ public class AdminstratorAPI {
     }
 
     @POST
-    @Path("/update")
+    @Path("/addTACompetentCourse")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
-    public Response update(
-            @FormParam("administratorId") String administratorId,
-            @FormParam("lastName") String lastName,
-            @FormParam("firstName") String firstName,
-            @FormParam("mobilePhone") String mobilePhone,
-            @FormParam("email") String email,
-            @FormParam("gender") String gender,
-            @FormParam("address") String address,
-            @FormParam("userName") String userName,
-            @FormParam("password") String password,
-            @FormParam("secretQuestion") String secretQuestion,
-            @FormParam("secretAnswer") String secretAnswer,
-            @FormParam("active") String active) {
-
-
-        AdministratorManager administratorManager = new AdministratorManager();
-
-        String error = administratorManager.updateAdministrator(administratorId, firstName, lastName, "",
-                mobilePhone, email, gender, address, userName, password, secretQuestion,
-                secretAnswer, active);
-
-        APIResponse payload = new APIResponse();
-        if (error == null) {
-            payload.setStatus(ResponseStatus.OK);
-        } else {
-            payload.setStatus(ResponseStatus.FAILED);
-            payload.setErrorCause(error);
-        }
-
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(payload);
-
-        System.out.println("Returning JSON:\n" + json);
-
-        return Response.ok(json, MediaType.APPLICATION_JSON).build();
-    }
-
-
-    @POST
-    @Path("/addRoleToAdministrator")
-    @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
-    public Response addRoleToAdministrator(@FormParam("adminUUID") String adminUUID, @FormParam("roleUUID") String roleUUID) {
+    public Response addTACompetentCourse(@FormParam("taUUID") String taUUID, @FormParam("courseUUID") String courseUUID) {
         APIResponse payload = new APIResponse();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
-            AdministratorManager administratorManager = new AdministratorManager();
-            String response = administratorManager.addRoleToAdministrator(adminUUID, roleUUID);
+            TeachingAssistantManager teachingAssistantManager = new TeachingAssistantManager();
+            String response = teachingAssistantManager.addTACompetentCourse(taUUID, courseUUID);
+            if (response != null) {
+                payload.setStatus(ResponseStatus.OK);
+            } else {
+                payload.setStatus(ResponseStatus.FAILED);
+                payload.setErrorCause(response);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            payload.setStatus(ResponseStatus.FAILED);
+        }
+        return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
+    }
+
+    @POST
+    @Path("/removeTACompetentCourse")
+    @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    public Response removeTACompetentCourse(@FormParam("taUUID") String taUUID, @FormParam("courseUUID") String courseUUID) {
+        APIResponse payload = new APIResponse();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try {
+            TeachingAssistantManager teachingAssistantManager = new TeachingAssistantManager();
+            String response = teachingAssistantManager.removeTACompetentCourse(taUUID, courseUUID);
             if (response != null) {
                 payload.setStatus(ResponseStatus.OK);
             } else {
@@ -123,14 +92,38 @@ public class AdminstratorAPI {
 
 
     @POST
-    @Path("/addRoleToAdministrator")
+    @Path("/addTAAssistingCourse")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
-    public Response removeRoleFromAdministrator(@FormParam("adminUUID") String adminUUID, @FormParam("roleUUID") String roleUUID) {
+    public Response addTAAssistingCourse(@FormParam("taUUID") String taUUID, @FormParam("courseUUID") String courseUUID) {
         APIResponse payload = new APIResponse();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
-            AdministratorManager administratorManager = new AdministratorManager();
-            String response = administratorManager.removeRoleFromAdministrator(adminUUID, roleUUID);
+            TeachingAssistantManager teachingAssistantManager = new TeachingAssistantManager();
+            String response = teachingAssistantManager.addTAAssistingCourse(taUUID, courseUUID);
+            if (response != null) {
+                payload.setStatus(ResponseStatus.OK);
+            } else {
+                payload.setStatus(ResponseStatus.FAILED);
+                payload.setErrorCause(response);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            payload.setStatus(ResponseStatus.FAILED);
+        }
+        return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
+    }
+
+
+    @POST
+    @Path("/addTAAssistingCourse")
+    @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    public Response removeTAAssistingCourse(@FormParam("taUUID") String taUUID, @FormParam("courseUUID") String courseUUID) {
+        APIResponse payload = new APIResponse();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try {
+            TeachingAssistantManager teachingAssistantManager = new TeachingAssistantManager();
+            String response = teachingAssistantManager.removeTAAssistingCourse(taUUID, courseUUID);
             if (response != null) {
                 payload.setStatus(ResponseStatus.OK);
             } else {
@@ -147,16 +140,16 @@ public class AdminstratorAPI {
 
 
     @GET
-    @Path("/allAdminstrators")
-    public Response getAllAdminstrators() {
+    @Path("/allTeachingAssistant")
+    public Response getAllTeachingAssistant() {
         APIResponse payload = new APIResponse();
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 
-        AdministratorManager administratorManager = new AdministratorManager();
+        TeachingAssistantManager teachingAssistantManager = new TeachingAssistantManager();
 
 
         try {
-            List<Administrator> list = administratorManager.getAllAdminstrators();
+            List<TeachingAssistant> list = teachingAssistantManager.getAllTeachingAssistants();
 
             if (list != null) {
                 payload.setStatus(ResponseStatus.OK);
@@ -176,22 +169,22 @@ public class AdminstratorAPI {
 
 
     @GET
-    @Path("/administrator/{uuid}")
+    @Path("/teachingAssistant/{uuid}")
     public Response getAdmin(@PathParam("uuid") String uuid) {
         APIResponse payload = new APIResponse();
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 
-        AdministratorManager administratorManager = new AdministratorManager();
+        TeachingAssistantManager teachingAssistantManager = new TeachingAssistantManager();
 
         try {
-            Administrator administrator = administratorManager.getAdministrator(uuid);
+            TeachingAssistant teachingAssistant = teachingAssistantManager.getTeachingAssistant(uuid);
 
-            if (administrator != null) {
+            if (teachingAssistant != null) {
                 payload.setStatus(ResponseStatus.OK);
-                payload.setResult(administrator);
+                payload.setResult(teachingAssistant);
             } else {
                 payload.setStatus(ResponseStatus.FAILED);
-                payload.setErrorCause(" This :" + administrator + " does not exist");
+                payload.setErrorCause(" This :" + teachingAssistant + " does not exist");
             }
             return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
             }.getType())).build();
@@ -204,14 +197,17 @@ public class AdminstratorAPI {
 
 
     @POST
-    @Path("/deleteCourseByUUID")
+    @Path("/deleteTeachingAssistantByUUID")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
     public Response deleteCourseByUUID(@FormParam("uuid") String uuid) {
         APIResponse payload = new APIResponse();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
-            AdministratorManager administratorManager = new AdministratorManager();
-            String response = administratorManager.deleteAdministratorByUUID(uuid);
+
+            TeachingAssistantManager teachingAssistantManager = new TeachingAssistantManager();
+
+            String response = teachingAssistantManager.deleteTAByUUID(uuid);
+
             if (response != null) {
                 payload.setStatus(ResponseStatus.OK);
             } else {
@@ -225,7 +221,6 @@ public class AdminstratorAPI {
         }
         return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
     }
-
 
 
 }

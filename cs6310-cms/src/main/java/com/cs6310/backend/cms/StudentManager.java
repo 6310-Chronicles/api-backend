@@ -1,6 +1,7 @@
 package com.cs6310.backend.cms;
 
 import com.cs6310.backend.helpers.DatabaseUtil;
+import com.cs6310.backend.helpers.Utils;
 import com.cs6310.backend.model.AccessCredential;
 import com.cs6310.backend.model.Course;
 import com.cs6310.backend.model.PersonDetails;
@@ -46,15 +47,15 @@ public class StudentManager {
      */
 
 
-    public String addStudent(String studentId, String studentStatus, Integer maxCourses, String firstName, String lastName, String profilePic,
+    public String addStudent(String studentId, String studentStatus, String maxCourses, String firstName, String lastName, String profilePic,
                              String mobilePhone, String email, String gender, String address, String username, String password, String secretQuestion,
-                             String secretAnswer, boolean active) {
+                             String secretAnswer, String active) {
 
 
         Student student = new Student();
         student.setStudentId(studentId);
         student.setStudentStatus(studentStatus);
-        student.setMaxCourses(maxCourses);
+        student.setMaxCourses(Utils.convertIntegerToString(maxCourses));
 
         PersonDetails personDetails = new PersonDetails();
         personDetails.setFirstName(firstName);
@@ -76,7 +77,7 @@ public class StudentManager {
         accessCredential.setPassword(password);
         accessCredential.setSecretQuestion(secretQuestion);
         accessCredential.setSecretAnswer(secretAnswer);
-        accessCredential.setActive(active);
+        accessCredential.setActive(Utils.convertStringToBool(active));
 
         student.setAccessCredential(accessCredential);
 
@@ -85,6 +86,7 @@ public class StudentManager {
             entityManager.getTransaction().begin();
             entityManager.persist(student);
             entityManager.getTransaction().commit();
+            return null;
         } catch (RollbackException e) {
             e.printStackTrace();
 
@@ -97,8 +99,10 @@ public class StudentManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
-        return null;
+
     }
 
     public void close() {
@@ -114,7 +118,7 @@ public class StudentManager {
     public List<Student> getAllStudents() {
         entityManager.getTransaction().begin();
         Query query = entityManager
-                .createNamedQuery("Student.getAll");
+                .createNamedQuery("com.cs6310.backend.model.Student.getAll");
         entityManager.getTransaction().commit();
         if (query.getResultList() != null) {
             return query.getResultList();
@@ -133,13 +137,15 @@ public class StudentManager {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Student.getByStudentId");
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByStudentId");
             query.setParameter("studentId", id);
             entityManager.getTransaction().commit();
             return (Student) query.getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        } finally {
+            entityManager.close();
         }
 
     }
@@ -150,44 +156,23 @@ public class StudentManager {
      * @param id
      * @return
      */
-    public Student getUserByUUID(String id) {
+    public Student getStudentByUUID(String id) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Student.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
             query.setParameter("uuid", id);
             entityManager.getTransaction().commit();
             return (Student) query.getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        } finally {
+            entityManager.close();
         }
 
     }
 
-
-    /**
-     * Get student by studentId
-     *
-     * @param id
-     * @return
-     */
-    public boolean deleteUserByStudentId(String id) {
-        try {
-            entityManager.getTransaction().begin();
-            Query query = entityManager
-                    .createNamedQuery("Student.getByStudentId");
-            query.setParameter("studentId", id);
-            Student student = (Student) query.getSingleResult();
-            entityManager.remove(student);
-            entityManager.getTransaction().commit();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-
-    }
 
 
     /**
@@ -196,19 +181,22 @@ public class StudentManager {
      * @param id
      * @return
      */
-    public boolean deleteUserByUUID(String id) {
+    public String deleteStudentByUUID(String id) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Student.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
             query.setParameter("uuid", id);
             Student student = (Student) query.getSingleResult();
             entityManager.remove(student);
             entityManager.getTransaction().commit();
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
@@ -220,16 +208,16 @@ public class StudentManager {
      * @param courseUUID
      * @return
      */
-    public boolean addStudentsCompletedCourse(String studentUUID, String courseUUID) {
+    public String addStudentsCompletedCourse(String studentUUID, String courseUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Student.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
             query.setParameter("uuid", studentUUID);
             Student student = (Student) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
 
@@ -238,10 +226,13 @@ public class StudentManager {
             entityManager.merge(student);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
@@ -254,16 +245,16 @@ public class StudentManager {
      * @param courseUUID
      * @return
      */
-    public boolean removeStudentsCompletedCourse(String studentUUID, String courseUUID) {
+    public String removeStudentsCompletedCourse(String studentUUID, String courseUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Student.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
             query.setParameter("uuid", studentUUID);
             Student student = (Student) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
 
@@ -273,16 +264,19 @@ public class StudentManager {
             for (int t = 0; t < size; t++) {
                 Course course1 = courseList.get(t);
                 if (course1.getUuid().equalsIgnoreCase(course.getUuid()))
-                    courseList.remove(t);
+                    student.getCompletedCourses().remove(t);
             }
             student.setCompletedCourses(courseList);
             entityManager.merge(student);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
@@ -295,16 +289,16 @@ public class StudentManager {
      * @param courseUUID
      * @return
      */
-    public boolean addStudentsRecommendedCourse(String studentUUID, String courseUUID) {
+    public String addStudentsRecommendedCourse(String studentUUID, String courseUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Student.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
             query.setParameter("uuid", studentUUID);
             Student student = (Student) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
 
@@ -313,10 +307,13 @@ public class StudentManager {
             entityManager.merge(student);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
@@ -329,16 +326,16 @@ public class StudentManager {
      * @param courseUUID
      * @return
      */
-    public boolean removeStudentsRecommendedCourse(String studentUUID, String courseUUID) {
+    public String removeStudentsRecommendedCourse(String studentUUID, String courseUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Student.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
             query.setParameter("uuid", studentUUID);
             Student student = (Student) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
             List<Course> courseList = student.getRecommendedCourses();
@@ -347,16 +344,19 @@ public class StudentManager {
             for (int t = 0; t < size; t++) {
                 Course course1 = courseList.get(t);
                 if (course1.getUuid().equalsIgnoreCase(course.getUuid()))
-                    courseList.remove(t);
+                    student.getRecommendedCourses().remove(t);
             }
             student.setRecommendedCourses(courseList);
             entityManager.merge(student);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
@@ -369,16 +369,16 @@ public class StudentManager {
      * @param courseUUID
      * @return
      */
-    public boolean addStudentsProgressCourse(String studentUUID, String courseUUID) {
+    public String addStudentsProgressCourse(String studentUUID, String courseUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Student.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
             query.setParameter("uuid", studentUUID);
             Student student = (Student) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
 
@@ -387,10 +387,13 @@ public class StudentManager {
             entityManager.merge(student);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
@@ -403,16 +406,16 @@ public class StudentManager {
      * @param courseUUID
      * @return
      */
-    public boolean removeStudentsProgressCourse(String studentUUID, String courseUUID) {
+    public String removeStudentsProgressCourse(String studentUUID, String courseUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Student.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
             query.setParameter("uuid", studentUUID);
             Student student = (Student) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
             List<Course> courseList = student.getCoursesInProgress();
@@ -421,17 +424,20 @@ public class StudentManager {
             for (int t = 0; t < size; t++) {
                 Course course1 = courseList.get(t);
                 if (course1.getUuid().equalsIgnoreCase(course.getUuid()))
-                    courseList.remove(t);
+                    student.getCoursesInProgress().remove(t);
             }
             student.setCoursesInProgress(courseList);
 
             entityManager.merge(student);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
@@ -444,28 +450,31 @@ public class StudentManager {
      * @param courseUUID
      * @return
      */
-    public boolean addStudentsToBeOptimizedCourse(String studentUUID, String courseUUID) {
+    public String addStudentsToBeOptimizedCourse(String studentUUID, String courseUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Student.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
             query.setParameter("uuid", studentUUID);
             Student student = (Student) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
 
-            student.getPrefferedCoursesToBeOptimized().add(course);
+            student.getPreferedCoursesToBeOptimized().add(course);
 
             entityManager.merge(student);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
@@ -478,35 +487,38 @@ public class StudentManager {
      * @param courseUUID
      * @return
      */
-    public boolean removeStudentsToBeOptimizedCourse(String studentUUID, String courseUUID) {
+    public String removeStudentsToBeOptimizedCourse(String studentUUID, String courseUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Student.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
             query.setParameter("uuid", studentUUID);
             Student student = (Student) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
-            List<Course> courseList = student.getPrefferedCoursesToBeOptimized();
+            List<Course> courseList = student.getPreferedCoursesToBeOptimized();
             int size = courseList.size();
 
             for (int t = 0; t < size; t++) {
                 Course course1 = courseList.get(t);
                 if (course1.getUuid().equalsIgnoreCase(course.getUuid()))
-                    courseList.remove(t);
+                    student.getPreferedCoursesToBeOptimized().remove(t);
             }
-            student.setPrefferedCoursesToBeOptimized(courseList);
+            student.setPreferedCoursesToBeOptimized(courseList);
 
             entityManager.merge(student);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
@@ -534,13 +546,13 @@ public class StudentManager {
      */
 
 
-    public String updateStudent(String studentId, String studentStatus, Integer maxCourses, String firstName, String lastName, String profilePic,
+    public String updateStudent(String studentId, String studentStatus, String maxCourses, String firstName, String lastName, String profilePic,
                                 String mobilePhone, String email, String gender, String address, String username, String password, String secretQuestion,
-                                String secretAnswer, boolean active) {
+                                String secretAnswer, String active) {
 
         entityManager.getTransaction().begin();
         Query query = entityManager
-                .createNamedQuery("Student.getByStudentId");
+                .createNamedQuery("com.cs6310.backend.model.Student.getByStudentId");
         query.setParameter("studentId", studentId);
         Student student = (Student) query.getSingleResult();
         entityManager.getTransaction().commit();
@@ -551,7 +563,7 @@ public class StudentManager {
         if (studentStatus != null)
             student.setStudentStatus(studentStatus);
         if (maxCourses != null)
-            student.setMaxCourses(maxCourses);
+            student.setMaxCourses(Utils.convertIntegerToString(maxCourses));
 
         PersonDetails personDetails = student.getPersonDetails();
         if (firstName != null)
@@ -583,6 +595,8 @@ public class StudentManager {
             accessCredential.setSecretQuestion(secretQuestion);
         if (secretAnswer != null)
             accessCredential.setSecretAnswer(secretAnswer);
+        if (active != null)
+            accessCredential.setActive(Utils.convertStringToBool(active));
 
 
         student.setAccessCredential(accessCredential);
@@ -592,6 +606,8 @@ public class StudentManager {
             entityManager.getTransaction().begin();
             entityManager.merge(student);
             entityManager.getTransaction().commit();
+
+            return null;
         } catch (RollbackException e) {
             e.printStackTrace();
 
@@ -605,8 +621,10 @@ public class StudentManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
-        return null;
+
     }
 
 

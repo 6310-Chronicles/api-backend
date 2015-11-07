@@ -1,7 +1,11 @@
 package com.cs6310.backend.cms;
 
 import com.cs6310.backend.helpers.DatabaseUtil;
-import com.cs6310.backend.model.*;
+import com.cs6310.backend.helpers.Utils;
+import com.cs6310.backend.model.AccessCredential;
+import com.cs6310.backend.model.Course;
+import com.cs6310.backend.model.PersonDetails;
+import com.cs6310.backend.model.Professor;
 import org.apache.log4j.Logger;
 
 import javax.persistence.EntityManager;
@@ -46,15 +50,14 @@ public class ProfessorManager {
      */
 
 
-    public String addProf(String profId, boolean available,String firstName, String lastName, String profilePic,
-                             String mobilePhone, String email, String gender, String address, String username, String password, String secretQuestion,
-                             String secretAnswer, boolean active) {
+    public String addProf(String profId, String available, String firstName, String lastName, String profilePic,
+                          String mobilePhone, String email, String gender, String address, String username, String password, String secretQuestion,
+                          String secretAnswer, String active) {
 
 
         Professor professor = new Professor();
 
-        professor.setAvailable(available);
-
+        professor.setAvailable(Utils.convertStringToBool(available));
 
         PersonDetails personDetails = new PersonDetails();
         personDetails.setFirstName(firstName);
@@ -75,7 +78,7 @@ public class ProfessorManager {
         accessCredential.setPassword(password);
         accessCredential.setSecretQuestion(secretQuestion);
         accessCredential.setSecretAnswer(secretAnswer);
-        accessCredential.setActive(active);
+        accessCredential.setActive(Utils.convertStringToBool(active));
 
         professor.setAccessCredential(accessCredential);
 
@@ -84,6 +87,7 @@ public class ProfessorManager {
             entityManager.getTransaction().begin();
             entityManager.persist(professor);
             entityManager.getTransaction().commit();
+            return null;
         } catch (RollbackException e) {
             e.printStackTrace();
 
@@ -96,8 +100,10 @@ public class ProfessorManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
-        return null;
+
     }
 
     public void close() {
@@ -107,22 +113,130 @@ public class ProfessorManager {
 
 
     /**
+     * Update adminstrator
+     *
+     * @param administratorId
+     * @param firstName
+     * @param lastName
+     * @param profilePic
+     * @param mobilePhone
+     * @param email
+     * @param gender
+     * @param address
+     * @param username
+     * @param password
+     * @param secretQuestion
+     * @param secretAnswer
+     * @param active
+     * @return
+     */
+
+    public String updateProf(String administratorId, String availability, String firstName, String lastName, String profilePic,
+                             String mobilePhone, String email, String gender, String address, String username, String password, String secretQuestion,
+                             String secretAnswer, String active) {
+
+        Professor professor = null;
+
+        entityManager.getTransaction().begin();
+        try {
+
+            Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Professor.getByUUID");
+            query.setParameter("uuid", administratorId);
+            professor = (Professor) query.getSingleResult();
+            professor.setAvailable(Utils.convertStringToBool(availability));
+
+
+            entityManager.getTransaction().commit();
+
+        } catch (Exception e) {
+            logger.error("Error -" + e.getMessage());
+        }
+
+
+        if (professor != null) {
+
+            PersonDetails personDetails = professor.getPersonDetails();
+
+            if (firstName != null)
+                personDetails.setFirstName(firstName);
+            if (lastName != null)
+                personDetails.setLastName(lastName);
+            if (mobilePhone != null)
+                personDetails.setMobilePhone(mobilePhone);
+            if (email != null)
+                personDetails.setEmail(email);
+            if (gender != null)
+                personDetails.setGender(gender);
+            if (address != null)
+                personDetails.setAddress(address);
+            if (profilePic != null)
+                personDetails.setProfilePic(profilePic);
+
+
+            professor.setPersonDetails(personDetails);
+
+
+            AccessCredential accessCredential = professor.getAccessCredential();
+
+            if (username != null)
+                accessCredential.setUsername(username);
+            if (password != null)
+                accessCredential.setPassword(password);
+            if (secretQuestion != null)
+                accessCredential.setSecretQuestion(secretQuestion);
+            if (secretAnswer != null)
+                accessCredential.setSecretAnswer(secretAnswer);
+            if (active != null)
+                accessCredential.setActive(Utils.convertStringToBool(active));
+
+
+            professor.setAccessCredential(accessCredential);
+
+
+            try {
+                entityManager.getTransaction().begin();
+                entityManager.persist(professor);
+                entityManager.getTransaction().commit();
+                return "OK";
+            } catch (RollbackException e) {
+                e.printStackTrace();
+
+                String code = DatabaseUtil.getSqlErrorCode(e);
+
+                logger.info("Error updating Professor: '{}'" + code);
+
+                return DatabaseUtil.getCauseMessage(e);
+            } catch (Exception e) {
+                e.printStackTrace();
+
+                return DatabaseUtil.getCauseMessage(e);
+            } finally {
+                entityManager.close();
+            }
+
+        }
+        return "OK";
+
+    }
+
+
+    /**
      * Assign competency Course to a prof
      *
      * @param profUUID
      * @param courseUUID
      * @return
      */
-    public boolean addProfCompetentCourse(String profUUID, String courseUUID) {
+    public String addProfCompetentCourse(String profUUID, String courseUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Professor.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Professor.getByUUID");
             query.setParameter("uuid", profUUID);
             Professor professor = (Professor) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
 
@@ -131,10 +245,12 @@ public class ProfessorManager {
             entityManager.merge(professor);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
@@ -147,16 +263,16 @@ public class ProfessorManager {
      * @param courseUUID
      * @return
      */
-    public boolean removeProfCompetentCourse(String profUUID, String courseUUID) {
+    public String removeProfCompetentCourse(String profUUID, String courseUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Professor.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Professor.getByUUID");
             query.setParameter("uuid", profUUID);
             Professor professor = (Professor) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
 
@@ -172,10 +288,12 @@ public class ProfessorManager {
             entityManager.merge(professor);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
@@ -189,16 +307,16 @@ public class ProfessorManager {
      * @param courseUUID
      * @return
      */
-    public boolean addProfTeachingCourse(String profUUID, String courseUUID) {
+    public String addProfTeachingCourse(String profUUID, String courseUUID) {
         try {
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Professor.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Professor.getByUUID");
             query.setParameter("uuid", profUUID);
             Professor professor = (Professor) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
 
@@ -207,13 +325,16 @@ public class ProfessorManager {
             entityManager.merge(professor);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
+
 
 
     /**
@@ -223,16 +344,18 @@ public class ProfessorManager {
      * @param courseUUID
      * @return
      */
-    public boolean removeProfTeachingCourse(String profUUID, String courseUUID) {
+
+    public String removeProfTeachingCourse(String profUUID, String courseUUID) {
         try {
+
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("Professor.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Professor.getByUUID");
             query.setParameter("uuid", profUUID);
             Professor professor = (Professor) query.getSingleResult();
 
             Query querycourse = entityManager
-                    .createNamedQuery("Course.getByUUID");
+                    .createNamedQuery("com.cs6310.backend.model.Course.getByUUID");
             querycourse.setParameter("uuid", courseUUID);
             Course course = (Course) querycourse.getSingleResult();
 
@@ -248,14 +371,86 @@ public class ProfessorManager {
             entityManager.merge(professor);
             entityManager.getTransaction().commit();
 
-            return true;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
         }
 
     }
 
+
+    /**
+     * Get All persisted Professors
+     *
+     * @return
+     */
+    public List<Professor> getAllProfessors() {
+        entityManager.getTransaction().begin();
+        Query query = entityManager
+                .createNamedQuery("com.cs6310.backend.model.Professor.getAll");
+        entityManager.getTransaction().commit();
+        if (query.getResultList() != null) {
+            return query.getResultList();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get Professor by id
+     *
+     * @param uuid
+     * @return
+     */
+    public Professor getProfessor(String uuid) {
+        try {
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Professor.getByUUID");
+            query.setParameter("uuid", uuid);
+            entityManager.getTransaction().commit();
+
+            return (Professor) query.getSingleResult();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            entityManager.close();
+        }
+
+    }
+
+
+    /**
+     * Delete Professor by UUID
+     *
+     * @param id
+     * @return
+     */
+    public String deleteProfessorByUUID(String id) {
+        try {
+
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Professor.getByUUID");
+            query.setParameter("uuid", id);
+            entityManager.remove(query.getSingleResult());
+            entityManager.getTransaction().commit();
+
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
+        }
+
+    }
 
 
 }

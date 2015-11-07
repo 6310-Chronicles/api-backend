@@ -2,7 +2,6 @@ package com.cs6310.backend.cms;
 
 import com.cs6310.backend.helpers.DatabaseUtil;
 import com.cs6310.backend.model.Privilege;
-import com.cs6310.backend.model.Role;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.log4j.Logger;
@@ -29,8 +28,8 @@ public class PrivilegeManager {
      * @param name
      * @return
      */
-    public boolean addPrivilege(String name) {
-        boolean resp = false;
+    public String addPrivilege(String name) {
+
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         entityManager.getTransaction().begin();
         try {
@@ -41,43 +40,80 @@ public class PrivilegeManager {
 
             entityManager.persist(privilege);
             entityManager.getTransaction().commit();
-            resp = true;
+
+
+            return "OK";
 
         } catch (Exception e) {
             e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
         }
-        return resp;
+
     }
 
 
     /**
-     * Get all persisted roles
+     * Delete a privilege by passing a uuid
      *
      * @return
      */
-    public List getAllPrivileges() {
-        entityManager.getTransaction().begin();
 
-        Query query = entityManager
-                .createNamedQuery("Privilege.getAll");
-
-        entityManager.getTransaction().commit();
-        if (query.getResultList() == null) {
-            return null;
-        } else {
-            return query.getResultList();
-        }
-    }
-
-
-    public Role getPrivilege(String uuid) {
+    public String deletePrivilege(String uuid) {
         entityManager.getTransaction().begin();
         try {
-            Query query = entityManager.createNamedQuery("Privilege.getByUUID");
+            Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Privilege.getByUUID");
             query.setParameter("uuid", uuid);
 
             if (query.getSingleResult() != null) {
-                return (Role) query.getSingleResult();
+
+                Privilege privilege = (Privilege) query.getSingleResult();
+
+                System.out.println("deletePrivilegedeletePrivilege-----------" + privilege.getName());
+                System.out.println("deletePrivilegedeletePrivilege-----------" + privilege.getUuid());
+                entityManager.remove(privilege);
+                entityManager.getTransaction().commit();
+                return "OK";
+            } else {
+                return null;
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return DatabaseUtil.getCauseMessage(e);
+        }
+
+
+    }
+
+    public String deleteAllPrivileges() {
+        boolean resp = false;
+        entityManager.getTransaction().begin();
+        try {
+            int deletedCount = entityManager.createQuery("DELETE FROM com.cs6310.backend.model.Privilege").executeUpdate();
+
+            System.out.println("@NO of Deleted recored: " + deletedCount);
+            entityManager.flush();
+            entityManager.getTransaction().commit();
+            return "OK";
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return DatabaseUtil.getCauseMessage(e);
+        }
+
+    }
+
+
+    public Privilege getPrivilege(String uuid) {
+        entityManager.getTransaction().begin();
+        try {
+            Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Privilege.getByUUID");
+            query.setParameter("uuid", uuid);
+
+            if (query.getSingleResult() != null) {
+                return (Privilege) query.getSingleResult();
             } else {
                 return null;
             }
@@ -88,20 +124,28 @@ public class PrivilegeManager {
     }
 
 
-    public boolean deleteAllPrivileges() {
-        boolean resp = false;
+    /**
+     * Get All persisted users
+     *
+     * @return
+     */
+    public List getAllPrivileges() {
         entityManager.getTransaction().begin();
-        try {
-            int deletedCount = entityManager.createQuery("DELETE FROM com.cs6310.backend.model.Privilege").executeUpdate();
+        Query query = entityManager
+                .createNamedQuery("com.cs6310.backend.model.Privilege.getAll");
+        entityManager.getTransaction().commit();
 
-            System.out.println("@NO of Deleted recored: " + deletedCount);
-            entityManager.flush();
-            entityManager.getTransaction().commit();
-        } catch (Exception e) {
-            e.printStackTrace();
+        List list = query.getResultList();
+
+        if (list != null) {
+            return list;
+        } else {
+            return null;
         }
-        return resp;
     }
+
+
+
 
 
 }

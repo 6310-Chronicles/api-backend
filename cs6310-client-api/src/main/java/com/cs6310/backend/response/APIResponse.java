@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName;
 public class APIResponse {
 	@Expose
 	private ResponseStatus status;
+
 	@Expose
 	private String errorCause;
 	

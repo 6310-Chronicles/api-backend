@@ -16,11 +16,8 @@ import java.io.Serializable;
 @Entity
 public class PersonDetails implements Serializable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
-    @Expose
+
     @Id
     @GeneratedValue
     private int id;
