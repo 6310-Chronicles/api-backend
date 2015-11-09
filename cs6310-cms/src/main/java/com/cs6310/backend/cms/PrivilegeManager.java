@@ -68,8 +68,6 @@ public class PrivilegeManager {
 
                 Privilege privilege = (Privilege) query.getSingleResult();
 
-                System.out.println("deletePrivilegedeletePrivilege-----------" + privilege.getName());
-                System.out.println("deletePrivilegedeletePrivilege-----------" + privilege.getUuid());
                 entityManager.remove(privilege);
                 entityManager.getTransaction().commit();
                 return "OK";
@@ -93,7 +91,6 @@ public class PrivilegeManager {
         try {
             int deletedCount = entityManager.createQuery("DELETE FROM com.cs6310.backend.model.Privilege").executeUpdate();
 
-            System.out.println("@NO of Deleted recored: " + deletedCount);
             entityManager.flush();
             entityManager.getTransaction().commit();
             return "OK";

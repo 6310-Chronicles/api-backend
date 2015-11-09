@@ -104,8 +104,6 @@ public class RoleAPI {
         try {
             List<Role> roles = upm.getAllRoles();
 
-            System.out.println("-------------------------------" + roles.size());
-
             if (roles != null) {
                 payload.setStatus(ResponseStatus.OK);
                 payload.setResult(roles);

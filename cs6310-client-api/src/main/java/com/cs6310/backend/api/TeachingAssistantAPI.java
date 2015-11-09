@@ -29,7 +29,7 @@ public class TeachingAssistantAPI {
         String error = teachingAssistantManager.addTeachingAssistant(studentId);
 
         APIResponse payload = new APIResponse();
-        if (error == null) {
+        if (error != null) {
             payload.setStatus(ResponseStatus.OK);
         } else {
             payload.setStatus(ResponseStatus.FAILED);
@@ -39,7 +39,6 @@ public class TeachingAssistantAPI {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(payload);
 
-        System.out.println("Returning JSON:\n" + json);
 
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
@@ -59,12 +58,13 @@ public class TeachingAssistantAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(response);
             }
-
+            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
-        return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
+
     }
 
     @POST
@@ -82,12 +82,12 @@ public class TeachingAssistantAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(response);
             }
-
+            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
-        return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
     }
 
 
@@ -107,16 +107,17 @@ public class TeachingAssistantAPI {
                 payload.setErrorCause(response);
             }
 
+            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
-        return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
     }
 
 
     @POST
-    @Path("/addTAAssistingCourse")
+    @Path("/removeTAAssistingCourse")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
     public Response removeTAAssistingCourse(@FormParam("taUUID") String taUUID, @FormParam("courseUUID") String courseUUID) {
         APIResponse payload = new APIResponse();
@@ -131,11 +132,12 @@ public class TeachingAssistantAPI {
                 payload.setErrorCause(response);
             }
 
+            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
-        return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
     }
 
 
@@ -161,6 +163,7 @@ public class TeachingAssistantAPI {
             return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
             }.getType())).build();
         } catch (Exception e) {
+            e.printStackTrace();
             payload = new APIResponse();
             payload.setStatus(ResponseStatus.FAILED);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
@@ -214,12 +217,12 @@ public class TeachingAssistantAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(response);
             }
-
+            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
-        return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
     }
 
 

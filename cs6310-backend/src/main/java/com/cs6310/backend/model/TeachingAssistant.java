@@ -12,10 +12,10 @@ import java.util.List;
  */
 @Cacheable
 @NamedQueries({
-        @NamedQuery(name = "com.cs6310.backend.model.TeachingAssistant.findByStudent", query = "select obj from Student obj where obj.accessCredential = : accessCredential"),
-        @NamedQuery(name = "com.cs6310.backend.model.TeachingAssistant.getAll", query = "select obj from Student obj"),
-        @NamedQuery(name = "com.cs6310.backend.model.TeachingAssistant.getByStudentId", query = "select obj from Student obj where obj.student.studentId = :studentId"),
-        @NamedQuery(name = "com.cs6310.backend.model.TeachingAssistant.getByUUID", query = "select obj from Student obj where obj.uuid =: uuid")
+        @NamedQuery(name = "com.cs6310.backend.model.TeachingAssistant.findByStudent", query = "select obj from TeachingAssistant obj where obj.accessCredential = : accessCredential"),
+        @NamedQuery(name = "com.cs6310.backend.model.TeachingAssistant.getAll", query = "select obj from TeachingAssistant obj"),
+        @NamedQuery(name = "com.cs6310.backend.model.TeachingAssistant.getByStudentId", query = "select obj from TeachingAssistant obj where obj.student.studentId = :studentId"),
+        @NamedQuery(name = "com.cs6310.backend.model.TeachingAssistant.getByUUID", query = "select obj from TeachingAssistant obj where obj.uuid =: uuid")
 
 })
 @Entity

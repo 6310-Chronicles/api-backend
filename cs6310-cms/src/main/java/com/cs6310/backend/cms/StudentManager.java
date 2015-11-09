@@ -86,14 +86,10 @@ public class StudentManager {
             entityManager.getTransaction().begin();
             entityManager.persist(student);
             entityManager.getTransaction().commit();
-            return null;
+
+            return "OK";
         } catch (RollbackException e) {
             e.printStackTrace();
-
-            String code = DatabaseUtil.getSqlErrorCode(e);
-            System.out.println("Error creating student: '{}'" + code);
-
-
             return DatabaseUtil.getCauseMessage(e);
         } catch (Exception e) {
             e.printStackTrace();
@@ -119,9 +115,11 @@ public class StudentManager {
         entityManager.getTransaction().begin();
         Query query = entityManager
                 .createNamedQuery("com.cs6310.backend.model.Student.getAll");
+        List list = query.getResultList();
+
         entityManager.getTransaction().commit();
-        if (query.getResultList() != null) {
-            return query.getResultList();
+        if (list != null) {
+            return list;
         } else {
             return null;
         }
@@ -139,8 +137,10 @@ public class StudentManager {
             Query query = entityManager
                     .createNamedQuery("com.cs6310.backend.model.Student.getByStudentId");
             query.setParameter("studentId", id);
+            Student student = (Student) query.getResultList();
+
             entityManager.getTransaction().commit();
-            return (Student) query.getSingleResult();
+            return student;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -162,13 +162,14 @@ public class StudentManager {
             Query query = entityManager
                     .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
             query.setParameter("uuid", id);
+
+            Student student = (Student) query.getSingleResult();
+
             entityManager.getTransaction().commit();
-            return (Student) query.getSingleResult();
+            return student;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -266,7 +267,7 @@ public class StudentManager {
                 if (course1.getUuid().equalsIgnoreCase(course.getUuid()))
                     student.getCompletedCourses().remove(t);
             }
-            student.setCompletedCourses(courseList);
+            //  student.setCompletedCourses(courseList);
             entityManager.merge(student);
             entityManager.getTransaction().commit();
 
@@ -346,7 +347,7 @@ public class StudentManager {
                 if (course1.getUuid().equalsIgnoreCase(course.getUuid()))
                     student.getRecommendedCourses().remove(t);
             }
-            student.setRecommendedCourses(courseList);
+//            student.setRecommendedCourses(courseList);
             entityManager.merge(student);
             entityManager.getTransaction().commit();
 
@@ -426,7 +427,7 @@ public class StudentManager {
                 if (course1.getUuid().equalsIgnoreCase(course.getUuid()))
                     student.getCoursesInProgress().remove(t);
             }
-            student.setCoursesInProgress(courseList);
+            //   student.setCoursesInProgress(courseList);
 
             entityManager.merge(student);
             entityManager.getTransaction().commit();
@@ -507,7 +508,7 @@ public class StudentManager {
                 if (course1.getUuid().equalsIgnoreCase(course.getUuid()))
                     student.getPreferedCoursesToBeOptimized().remove(t);
             }
-            student.setPreferedCoursesToBeOptimized(courseList);
+            //  student.setPreferedCoursesToBeOptimized(courseList);
 
             entityManager.merge(student);
             entityManager.getTransaction().commit();
@@ -546,14 +547,14 @@ public class StudentManager {
      */
 
 
-    public String updateStudent(String studentId, String studentStatus, String maxCourses, String firstName, String lastName, String profilePic,
+    public String updateStudent(String uuid, String studentId, String studentStatus, String maxCourses, String firstName, String lastName, String profilePic,
                                 String mobilePhone, String email, String gender, String address, String username, String password, String secretQuestion,
                                 String secretAnswer, String active) {
 
         entityManager.getTransaction().begin();
         Query query = entityManager
-                .createNamedQuery("com.cs6310.backend.model.Student.getByStudentId");
-        query.setParameter("studentId", studentId);
+                .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
+        query.setParameter("uuid", uuid);
         Student student = (Student) query.getSingleResult();
         entityManager.getTransaction().commit();
 
@@ -607,7 +608,7 @@ public class StudentManager {
             entityManager.merge(student);
             entityManager.getTransaction().commit();
 
-            return null;
+            return "OK";
         } catch (RollbackException e) {
             e.printStackTrace();
 

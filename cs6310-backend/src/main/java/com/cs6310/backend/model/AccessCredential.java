@@ -16,7 +16,6 @@ import java.io.Serializable;
                 query = "select obj from AccessCredential obj where obj.username = :username"),
 })
 @Entity
-@Table(name = "accesscredential")
 public class AccessCredential implements Serializable {
 
     /**
@@ -31,9 +30,11 @@ public class AccessCredential implements Serializable {
     @Expose
     @Column(unique = true, nullable = false, updatable = false)
     private String username;
+
     @Expose
     @Column
     private String password;
+
     @Expose
     @Column
     private String secretQuestion;

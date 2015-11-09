@@ -52,8 +52,10 @@ public class AdministratorManager {
 
 
         Administrator administrator = new Administrator();
+
         administrator.setAdministratorId(administratorId);
 
+        administrator.setUuid(String.valueOf(UUID.randomUUID()));
 
         PersonDetails personDetails = new PersonDetails();
         personDetails.setFirstName(firstName);
@@ -67,7 +69,7 @@ public class AdministratorManager {
         personDetails.setUuid(String.valueOf(UUID.randomUUID()));
 
         administrator.setPersonDetails(personDetails);
-        administrator.setUuid(String.valueOf(UUID.randomUUID()));
+
 
         AccessCredential accessCredential = new AccessCredential();
         accessCredential.setUsername(username);
@@ -83,6 +85,8 @@ public class AdministratorManager {
             entityManager.getTransaction().begin();
             entityManager.persist(administrator);
             entityManager.getTransaction().commit();
+
+            return "OK";
         } catch (RollbackException e) {
             e.printStackTrace();
 
@@ -91,12 +95,16 @@ public class AdministratorManager {
             logger.info("Error creating administrator: '{}'" + code);
 
             return DatabaseUtil.getCauseMessage(e);
+
         } catch (Exception e) {
             e.printStackTrace();
 
+            String code = DatabaseUtil.getSqlErrorCode(e);
+
+            logger.info("Error creating administrator: '{}'" + code);
             return DatabaseUtil.getCauseMessage(e);
         }
-        return "OK";
+
     }
 
 
@@ -119,7 +127,7 @@ public class AdministratorManager {
      * @return
      */
 
-    public String updateAdministrator(String administratorId, String firstName, String lastName, String profilePic,
+    public String updateAdministrator(String uuid, String administratorId, String firstName, String lastName, String profilePic,
                                       String mobilePhone, String email, String gender, String address, String username, String password, String secretQuestion,
                                       String secretAnswer, String active) {
 
@@ -129,7 +137,9 @@ public class AdministratorManager {
         try {
 
             Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Administrator.getByUUID");
-            query.setParameter("uuid", administratorId);
+
+            query.setParameter("uuid", uuid);
+
             administrator = (Administrator) query.getSingleResult();
 
             entityManager.getTransaction().commit();
@@ -159,7 +169,6 @@ public class AdministratorManager {
                 personDetails.setProfilePic(profilePic);
 
 
-
             administrator.setPersonDetails(personDetails);
 
 
@@ -182,8 +191,10 @@ public class AdministratorManager {
 
             try {
                 entityManager.getTransaction().begin();
-                entityManager.persist(administrator);
+                entityManager.merge(administrator);
                 entityManager.getTransaction().commit();
+                return "OK";
+
             } catch (RollbackException e) {
                 e.printStackTrace();
 
@@ -198,8 +209,8 @@ public class AdministratorManager {
                 return DatabaseUtil.getCauseMessage(e);
             }
 
-        }
-        return "OK";
+        } else return null;
+
     }
 
 
@@ -216,13 +227,13 @@ public class AdministratorManager {
      * @return
      */
     public String addRoleToAdministrator(String adminUUID, String roleUUID) {
-        boolean resp = false;
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
         entityManager.getTransaction().begin();
         try {
 
             Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Administrator.getByUUID");
             query.setParameter("uuid", adminUUID);
+
             Administrator administrator = (Administrator) query.getSingleResult();
 
 
@@ -231,9 +242,12 @@ public class AdministratorManager {
             Role role = (Role) queryPrivilege.getSingleResult();
 
             administrator.getRoles().add(role);
-            entityManager.merge(administrator);
+            role.getAdministrator().add(administrator);
+
+
+            entityManager.merge(role);
             entityManager.getTransaction().commit();
-            resp = true;
+
 
             return "OK";
 
@@ -294,13 +308,18 @@ public class AdministratorManager {
      *
      * @return
      */
-    public List<Administrator> getAllAdminstrators() {
+    public List getAllAdminstrators() {
         entityManager.getTransaction().begin();
         Query query = entityManager
                 .createNamedQuery("com.cs6310.backend.model.Administrator.getAll");
+
+
+        List list = query.getResultList();
+
         entityManager.getTransaction().commit();
-        if (query.getResultList() != null) {
-            return query.getResultList();
+
+        if (list != null) {
+            return list;
         } else {
             return null;
         }
@@ -346,16 +365,13 @@ public class AdministratorManager {
 
             entityManager.remove(query.getSingleResult());
             entityManager.getTransaction().commit();
-            return null;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
         }
 
     }
-
-
-
 
 
 }

@@ -186,7 +186,7 @@ public class RoleManager {
         entityManager.getTransaction().begin();
         try {
             int deletedCount = entityManager.createQuery("DELETE FROM Role").executeUpdate();
-            System.out.println("@NO of Deleted recored: " + deletedCount);
+
 
         } catch (Exception e) {
             e.printStackTrace();

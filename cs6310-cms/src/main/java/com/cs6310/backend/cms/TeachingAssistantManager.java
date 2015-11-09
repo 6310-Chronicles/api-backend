@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.RollbackException;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by nelson on 11/3/15.
@@ -39,32 +40,32 @@ public class TeachingAssistantManager {
     public String addTeachingAssistant(String studentId) {
 
 
-        Student student = getStudentByUUID(studentId);
 
-        TeachingAssistant ta = new TeachingAssistant();
-
-        ta.setStudent(student);
 
 
         try {
             entityManager.getTransaction().begin();
+
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
+            query.setParameter("uuid", studentId);
+            Student student = (Student) query.getSingleResult();
+            TeachingAssistant ta = new TeachingAssistant();
+
+            ta.setStudent(student);
+            ta.setUuid(String.valueOf(UUID.randomUUID()));
+
             entityManager.persist(ta);
             entityManager.getTransaction().commit();
             return "OK";
         } catch (RollbackException e) {
             e.printStackTrace();
 
-            String code = DatabaseUtil.getSqlErrorCode(e);
-            System.out.println("Error creating student: '{}'" + code);
-
-
             return DatabaseUtil.getCauseMessage(e);
         } catch (Exception e) {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -131,9 +132,9 @@ public class TeachingAssistantManager {
             for (int t = 0; t < size; t++) {
                 Course course1 = courseList.get(t);
                 if (course1.getUuid().equalsIgnoreCase(course.getUuid()))
-                    courseList.remove(t);
+                    teachingAssistant.getCompetency().remove(t);
             }
-            teachingAssistant.setCompetency(courseList);
+            // teachingAssistant.setCompetency(courseList);
             entityManager.merge(teachingAssistant);
             entityManager.getTransaction().commit();
 
@@ -210,9 +211,8 @@ public class TeachingAssistantManager {
             for (int t = 0; t < size; t++) {
                 Course course1 = courseList.get(t);
                 if (course1.getUuid().equalsIgnoreCase(course.getUuid()))
-                    courseList.remove(t);
+                    teachingAssistant.getAssisting().remove(t);
             }
-            teachingAssistant.setAssisting(courseList);
             entityManager.merge(teachingAssistant);
             entityManager.getTransaction().commit();
 
@@ -239,8 +239,10 @@ public class TeachingAssistantManager {
             Query query = entityManager
                     .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
             query.setParameter("uuid", id);
+            Student student = (Student) query.getSingleResult();
+
             entityManager.getTransaction().commit();
-            return (Student) query.getSingleResult();
+            return student;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -260,9 +262,13 @@ public class TeachingAssistantManager {
         entityManager.getTransaction().begin();
         Query query = entityManager
                 .createNamedQuery("com.cs6310.backend.model.TeachingAssistant.getAll");
+
+        List list = query.getResultList();
+
         entityManager.getTransaction().commit();
-        if (query.getResultList() != null) {
-            return query.getResultList();
+
+        if (list != null) {
+            return list;
         } else {
             return null;
         }
@@ -280,16 +286,17 @@ public class TeachingAssistantManager {
             Query query = entityManager
                     .createNamedQuery("com.cs6310.backend.model.TeachingAssistant.getByUUID");
             query.setParameter("uuid", uuid);
+
+            TeachingAssistant teachingAssistant = (TeachingAssistant) query.getSingleResult();
+
             entityManager.getTransaction().commit();
 
-            return (TeachingAssistant) query.getSingleResult();
+            return teachingAssistant;
 
 
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -308,10 +315,12 @@ public class TeachingAssistantManager {
             Query query = entityManager
                     .createNamedQuery("com.cs6310.backend.model.TeachingAssistant.getByUUID");
             query.setParameter("uuid", id);
-            entityManager.remove(query.getSingleResult());
+            TeachingAssistant teachingAssistant = (TeachingAssistant) query.getSingleResult();
+
+            entityManager.remove(teachingAssistant);
             entityManager.getTransaction().commit();
 
-            return null;
+            return "OK";
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);

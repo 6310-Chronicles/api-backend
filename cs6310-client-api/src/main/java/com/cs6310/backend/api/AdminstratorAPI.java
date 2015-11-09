@@ -16,7 +16,6 @@ import java.util.List;
 @Path("/administrator")
 public class AdminstratorAPI {
 
-
     @POST
     @Path("/create")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
@@ -37,12 +36,13 @@ public class AdminstratorAPI {
 
         AdministratorManager administratorManager = new AdministratorManager();
 
+
         String error = administratorManager.addAdministrator(administratorId, firstName, lastName, "",
                 mobilePhone, email, gender, address, userName, password, secretQuestion,
                 secretAnswer, active);
 
         APIResponse payload = new APIResponse();
-        if (error == null) {
+        if (error != null) {
             payload.setStatus(ResponseStatus.OK);
         } else {
             payload.setStatus(ResponseStatus.FAILED);
@@ -52,7 +52,6 @@ public class AdminstratorAPI {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(payload);
 
-        System.out.println("Returning JSON:\n" + json);
 
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
@@ -61,6 +60,7 @@ public class AdminstratorAPI {
     @Path("/update")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
     public Response update(
+            @FormParam("uuid") String uuid,
             @FormParam("administratorId") String administratorId,
             @FormParam("lastName") String lastName,
             @FormParam("firstName") String firstName,
@@ -77,12 +77,12 @@ public class AdminstratorAPI {
 
         AdministratorManager administratorManager = new AdministratorManager();
 
-        String error = administratorManager.updateAdministrator(administratorId, firstName, lastName, "",
+        String error = administratorManager.updateAdministrator(uuid, administratorId, firstName, lastName, "",
                 mobilePhone, email, gender, address, userName, password, secretQuestion,
                 secretAnswer, active);
 
         APIResponse payload = new APIResponse();
-        if (error == null) {
+        if (error != null) {
             payload.setStatus(ResponseStatus.OK);
         } else {
             payload.setStatus(ResponseStatus.FAILED);
@@ -91,8 +91,6 @@ public class AdminstratorAPI {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(payload);
-
-        System.out.println("Returning JSON:\n" + json);
 
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
@@ -123,7 +121,7 @@ public class AdminstratorAPI {
 
 
     @POST
-    @Path("/addRoleToAdministrator")
+    @Path("/removeRoleFromAdministrator")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
     public Response removeRoleFromAdministrator(@FormParam("adminUUID") String adminUUID, @FormParam("roleUUID") String roleUUID) {
         APIResponse payload = new APIResponse();
@@ -158,6 +156,7 @@ public class AdminstratorAPI {
         try {
             List<Administrator> list = administratorManager.getAllAdminstrators();
 
+
             if (list != null) {
                 payload.setStatus(ResponseStatus.OK);
                 payload.setResult(list);
@@ -168,6 +167,7 @@ public class AdminstratorAPI {
             return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
             }.getType())).build();
         } catch (Exception e) {
+            e.printStackTrace();
             payload = new APIResponse();
             payload.setStatus(ResponseStatus.FAILED);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
@@ -191,7 +191,7 @@ public class AdminstratorAPI {
                 payload.setResult(administrator);
             } else {
                 payload.setStatus(ResponseStatus.FAILED);
-                payload.setErrorCause(" This :" + administrator + " does not exist");
+                payload.setErrorCause(" This :" + uuid + " does not exist");
             }
             return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
             }.getType())).build();
@@ -204,7 +204,7 @@ public class AdminstratorAPI {
 
 
     @POST
-    @Path("/deleteCourseByUUID")
+    @Path("/deleteAdminByUUID")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
     public Response deleteCourseByUUID(@FormParam("uuid") String uuid) {
         APIResponse payload = new APIResponse();
@@ -225,7 +225,6 @@ public class AdminstratorAPI {
         }
         return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
     }
-
 
 
 }

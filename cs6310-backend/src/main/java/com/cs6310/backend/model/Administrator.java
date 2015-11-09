@@ -51,7 +51,7 @@ public class Administrator implements Serializable {
 
 
     @Expose
-    @ManyToMany(targetEntity = com.cs6310.backend.model.Role.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Role.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private List<Role> roles = new ArrayList<>();
 
 

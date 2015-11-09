@@ -18,7 +18,6 @@ import java.util.List;
         @NamedQuery(name = "com.cs6310.backend.model.Student.getByStudentId", query = "select obj from Student obj where obj.studentId = :studentId"),
         @NamedQuery(name = "com.cs6310.backend.model.Student.getByUUID", query = "select obj from Student obj where obj.uuid =: uuid"),
         @NamedQuery(name = "com.cs6310.backend.model.Student.getByPersonalDetails", query = "select obj from Student obj where obj.personDetails =: personalDetails")
-
 })
 
 @Entity
@@ -59,7 +58,6 @@ public class Student implements Serializable {
     @Expose
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private AccessCredential accessCredential;
-
 
 
     @Expose

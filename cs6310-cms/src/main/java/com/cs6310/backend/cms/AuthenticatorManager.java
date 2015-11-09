@@ -2,8 +2,6 @@ package com.cs6310.backend.cms;
 
 import com.cs6310.backend.helpers.DatabaseUtil;
 import com.cs6310.backend.model.AccessCredential;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -41,25 +39,16 @@ public class AuthenticatorManager {
                     .getSingleResult();
             if (accessCredential != null) {
                 if (accessCredential.getPassword().equals(password)) {
-                    Gson gson = new GsonBuilder().setPrettyPrinting()
-                            .excludeFieldsWithoutExposeAnnotation().create();
 
-                    System.out.println(gson.toJson(accessCredential));
-
-                    Query query = entityManager
-                            .createNamedQuery("com.cs6310.backend.model.Student.findByCredentials");
-                    query.setParameter("accessCredential", accessCredential);
-
-                    Object object = query.getSingleResult();
-                    if (object != null) {
-                        return object;
+                    if (accessCredential != null) {
+                        return accessCredential;
                     }
 
                 } else {
                     return null;
                 }
             } else {
-                System.out.println("No matching credentials");
+
             }
         } catch (Exception e) {
             e.printStackTrace();

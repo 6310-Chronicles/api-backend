@@ -42,7 +42,7 @@ public class Course implements Serializable {
     private boolean mustBeOffered;
 
     @Expose
-    private Integer courseName;
+    private String courseName;
 
     @Expose
     private Integer priority;
@@ -57,7 +57,24 @@ public class Course implements Serializable {
     private Integer currentEnrollment;
 
     @Expose
-    private List<String> listOfPrerequisiteCourses;
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "COURSE_PREREQUISITE",
+            joinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "prerequisite_id", referencedColumnName = "id"))
+    private List<Course> prerequisites = new ArrayList();
+
+
+//    @ManyToMany
+//    @JoinTable(name="USER_FAN",
+//            joinColumns= @JoinColumn(name="user_id", referencedColumnName="id"),
+//            inverseJoinColumns=  @JoinColumn(name="fan_id",referencedColumnName="id"))
+//    private List myFans = new ArrayList();
+
+
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "prerequisites")
+    private List<Course> prerequisitesData = new ArrayList();
+
 
     @Expose
     @ManyToMany(targetEntity = com.cs6310.backend.model.Semester.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
@@ -131,11 +148,11 @@ public class Course implements Serializable {
         this.mustBeOffered = mustBeOffered;
     }
 
-    public Integer getCourseName() {
+    public String getCourseName() {
         return courseName;
     }
 
-    public void setCourseName(Integer courseName) {
+    public void setCourseName(String courseName) {
         this.courseName = courseName;
     }
 
@@ -163,15 +180,7 @@ public class Course implements Serializable {
         this.currentEnrollment = currentEnrollment;
     }
 
-    public List<String> getListOfPrerequisiteCourses() {
-        if (listOfPrerequisiteCourses == null)
-            listOfPrerequisiteCourses = new ArrayList<>();
-        return listOfPrerequisiteCourses;
-    }
 
-    public void setListOfPrerequisiteCourses(List<String> listOfPrerequisiteCourses) {
-        this.listOfPrerequisiteCourses = listOfPrerequisiteCourses;
-    }
 
     public List<Semester> getOfferedInSemester() {
         if (offeredInSemester == null)
@@ -189,5 +198,13 @@ public class Course implements Serializable {
 
     public void setPriority(Integer priority) {
         this.priority = priority;
+    }
+
+    public List<Course> getListOfPrerequisiteCourses() {
+        return prerequisites;
+    }
+
+    public void setListOfPrerequisiteCourses(List<Course> prerequisites) {
+        this.prerequisites = prerequisites;
     }
 }

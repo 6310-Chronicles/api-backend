@@ -13,7 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-@Path("/administrator")
+@Path("/student")
 public class StudentAPI {
 
 
@@ -43,7 +43,7 @@ public class StudentAPI {
                 secretAnswer, active);
 
         APIResponse payload = new APIResponse();
-        if (error == null) {
+        if (error != null) {
             payload.setStatus(ResponseStatus.OK);
         } else {
             payload.setStatus(ResponseStatus.FAILED);
@@ -53,8 +53,6 @@ public class StudentAPI {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(payload);
 
-        System.out.println("Returning JSON:\n" + json);
-
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
 
@@ -63,10 +61,10 @@ public class StudentAPI {
     @Path("/update")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
     public Response update(
+            @FormParam("uuid") String uuid,
             @FormParam("studentId") String studentId,
             @FormParam("maxCourses") String maxCourses,
             @FormParam("studentStatus") String studentStatus,
-
             @FormParam("lastName") String lastName,
             @FormParam("firstName") String firstName,
             @FormParam("mobilePhone") String mobilePhone,
@@ -82,12 +80,12 @@ public class StudentAPI {
 
         StudentManager studentManager = new StudentManager();
 
-        String error = studentManager.updateStudent(studentId, studentStatus, maxCourses, firstName, lastName, "",
+        String error = studentManager.updateStudent(uuid, studentId, studentStatus, maxCourses, firstName, lastName, "",
                 mobilePhone, email, gender, address, userName, password, secretQuestion,
                 secretAnswer, active);
 
         APIResponse payload = new APIResponse();
-        if (error == null) {
+        if (error != null) {
             payload.setStatus(ResponseStatus.OK);
         } else {
             payload.setStatus(ResponseStatus.FAILED);
@@ -97,7 +95,6 @@ public class StudentAPI {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(payload);
 
-        System.out.println("Returning JSON:\n" + json);
 
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
@@ -325,6 +322,7 @@ public class StudentAPI {
             return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
             }.getType())).build();
         } catch (Exception e) {
+            e.printStackTrace();
             payload = new APIResponse();
             payload.setStatus(ResponseStatus.FAILED);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
@@ -353,6 +351,7 @@ public class StudentAPI {
             return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
             }.getType())).build();
         } catch (Exception e) {
+            e.printStackTrace();
             payload = new APIResponse();
             payload.setStatus(ResponseStatus.FAILED);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
@@ -361,7 +360,7 @@ public class StudentAPI {
 
 
     @POST
-    @Path("/deleteCourseByUUID")
+    @Path("/deleteStudentByUUID")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
     public Response deleteStudentByUUID(@FormParam("uuid") String uuid) {
         APIResponse payload = new APIResponse();

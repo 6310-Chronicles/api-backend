@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by nelson on 11/6/15.
  */
-@Path("/administrator")
+@Path("/professor")
 public class ProfessorAPI {
 
 
@@ -24,7 +24,6 @@ public class ProfessorAPI {
     @Path("/create")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
     public Response create(
-            @FormParam("profId") String profId,
             @FormParam("availability") String availability,
             @FormParam("lastName") String lastName,
             @FormParam("firstName") String firstName,
@@ -41,7 +40,7 @@ public class ProfessorAPI {
 
         ProfessorManager professorManager = new ProfessorManager();
 
-        String error = professorManager.addProf(profId, availability, firstName, lastName, "",
+        String error = professorManager.addProf(availability, firstName, lastName, "",
                 mobilePhone, email, gender, address, userName, password, secretQuestion,
                 secretAnswer, active);
 
@@ -56,7 +55,6 @@ public class ProfessorAPI {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(payload);
 
-        System.out.println("Returning JSON:\n" + json);
 
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
@@ -65,7 +63,7 @@ public class ProfessorAPI {
     @Path("/update")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
     public Response update(
-            @FormParam("profId") String profId,
+            @FormParam("uuid") String uuid,
             @FormParam("availability") String availability,
             @FormParam("lastName") String lastName,
             @FormParam("firstName") String firstName,
@@ -82,12 +80,12 @@ public class ProfessorAPI {
 
         ProfessorManager professorManager = new ProfessorManager();
 
-        String error = professorManager.updateProf(profId, availability, firstName, lastName, "",
+        String error = professorManager.updateProf(uuid, availability, firstName, lastName, "",
                 mobilePhone, email, gender, address, userName, password, secretQuestion,
                 secretAnswer, active);
 
         APIResponse payload = new APIResponse();
-        if (error == null) {
+        if (error != null) {
             payload.setStatus(ResponseStatus.OK);
         } else {
             payload.setStatus(ResponseStatus.FAILED);
@@ -97,14 +95,13 @@ public class ProfessorAPI {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(payload);
 
-        System.out.println("Returning JSON:\n" + json);
 
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
 
 
     @GET
-    @Path("/allPrefessots")
+    @Path("/allProfessors")
     public Response getAllProfessors() {
         APIResponse payload = new APIResponse();
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
@@ -125,6 +122,7 @@ public class ProfessorAPI {
             return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
             }.getType())).build();
         } catch (Exception e) {
+            e.printStackTrace();
             payload = new APIResponse();
             payload.setStatus(ResponseStatus.FAILED);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
@@ -150,9 +148,12 @@ public class ProfessorAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(" This :" + professor + " does not exist");
             }
+
+
             return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
             }.getType())).build();
         } catch (Exception e) {
+            e.printStackTrace();
             payload = new APIResponse();
             payload.setStatus(ResponseStatus.FAILED);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
@@ -176,11 +177,15 @@ public class ProfessorAPI {
                 payload.setErrorCause(response);
             }
 
+            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
         } catch (Exception e) {
             e.printStackTrace();
+            e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
-        return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
+
+
     }
 
 
@@ -200,11 +205,13 @@ public class ProfessorAPI {
                 payload.setErrorCause(response);
             }
 
+            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
-        return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
+
     }
 
 
@@ -223,12 +230,13 @@ public class ProfessorAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(response);
             }
-
+            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
-        return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
+
     }
 
 
@@ -247,12 +255,13 @@ public class ProfessorAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(response);
             }
-
+            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
-        return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
+
     }
 
 
@@ -271,12 +280,13 @@ public class ProfessorAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(response);
             }
+            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
 
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
-        return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
     }
 
 

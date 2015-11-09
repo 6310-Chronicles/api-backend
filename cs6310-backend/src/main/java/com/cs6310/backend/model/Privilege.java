@@ -28,6 +28,7 @@ public class Privilege implements Serializable{
 	@Expose
 	@Column(unique = true, nullable = true)
 	private String uuid;
+
 	@Expose
 	@Unique
 	@Column

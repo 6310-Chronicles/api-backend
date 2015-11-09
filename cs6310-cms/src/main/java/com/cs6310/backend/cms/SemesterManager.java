@@ -125,14 +125,12 @@ public class SemesterManager {
 
     }
 
-
     public boolean deleteAllSemesters() {
         boolean resp = false;
         entityManager.getTransaction().begin();
         try {
             int deletedCount = entityManager.createQuery("DELETE FROM com.cs6310.backend.model.Semester").executeUpdate();
 
-            System.out.println("@NO of Deleted recored: " + deletedCount);
             entityManager.flush();
             entityManager.getTransaction().commit();
         } catch (Exception e) {

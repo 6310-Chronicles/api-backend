@@ -28,9 +28,11 @@
       <version>1.2.17</version>
     </dependency>
   </dependencies>
+
   <modules>
     <module>cs6310-backend</module>
     <module>cs6310-cms</module>
     <module>cs6310-client-api</module>
   </modules>
+
 </project>
