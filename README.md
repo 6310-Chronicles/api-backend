@@ -1,9 +1,9 @@
 # api-backend
-What I have done
-- Models
-- Model managers to persisit data to the database
+All Endpoits now working
 
-Yet to do
-- Expose API for all the models
-- Write a clear documentation to run the application locally
-- Many more.....
+For details
+Go to http://cs6310-api-v1.mybluemix.net/
+ OR
+https://github.com/6310-Chronicles/api-backend/blob/master/documentation/API-CS6310-BACKEND.docx
+
+
