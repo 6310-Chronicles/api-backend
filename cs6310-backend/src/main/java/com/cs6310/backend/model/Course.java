@@ -15,7 +15,8 @@ import java.util.List;
 @NamedQueries({
         @NamedQuery(name = "com.cs6310.backend.model.Course.getAll", query = "select obj from Course obj"),
         @NamedQuery(name = "com.cs6310.backend.model.Course.getByUUID", query = "select obj from Course obj where obj.uuid = :uuid"),
-        @NamedQuery(name = "com.cs6310.backend.model.Course.getByName", query = "select obj from Course obj where obj.name = :name")
+        @NamedQuery(name = "com.cs6310.backend.model.Course.getByName", query = "select obj from Course obj where obj.name = :name"),
+        @NamedQuery(name = "com.cs6310.backend.model.Course.getCourseID", query = "select obj from Course obj where obj.courseId = :courseId")
 })
 @Entity
 @Table(name = "course")
@@ -31,8 +32,8 @@ public class Course implements Serializable {
     @Column(unique = true)
     private String uuid;
 
-
     @Expose
+    @Column(unique = true, nullable = false)
     private String courseId;
 
     @Expose

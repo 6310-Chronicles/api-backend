@@ -32,6 +32,7 @@ public class Semester implements Serializable {
     private String uuid;
 
     @Expose
+    @Column(unique = true)
     private String name;
 
     @Expose

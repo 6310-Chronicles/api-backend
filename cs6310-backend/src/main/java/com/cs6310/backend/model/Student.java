@@ -17,7 +17,8 @@ import java.util.List;
         @NamedQuery(name = "com.cs6310.backend.model.Student.getAll", query = "select obj from Student obj"),
         @NamedQuery(name = "com.cs6310.backend.model.Student.getByStudentId", query = "select obj from Student obj where obj.studentId = :studentId"),
         @NamedQuery(name = "com.cs6310.backend.model.Student.getByUUID", query = "select obj from Student obj where obj.uuid =: uuid"),
-        @NamedQuery(name = "com.cs6310.backend.model.Student.getByPersonalDetails", query = "select obj from Student obj where obj.personDetails =: personalDetails")
+        @NamedQuery(name = "com.cs6310.backend.model.Student.getByPersonalDetails", query = "select obj from Student obj where obj.personDetails =: personalDetails"),
+        @NamedQuery(name = "com.cs6310.backend.model.Student.getByStudentId", query = "select obj from Student obj where obj.studentId =: studentId")
 })
 
 @Entity
@@ -39,7 +40,7 @@ public class Student implements Serializable {
     private String uuid;
 
     @Expose
-    @Column
+    @Column(unique = true)
     private String studentId;
 
     @Expose
@@ -59,7 +60,6 @@ public class Student implements Serializable {
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private AccessCredential accessCredential;
 
-
     @Expose
     @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,})
     private List<Course> completedCourses = new ArrayList<>();
@@ -68,7 +68,6 @@ public class Student implements Serializable {
     @Expose
     @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,})
     private List<Course> recommendedCourses = new ArrayList<>();
-
 
     @Expose
     @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,})

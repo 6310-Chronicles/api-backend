@@ -25,6 +25,7 @@ public class ProfessorAPI {
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
     public Response create(
             @FormParam("availability") String availability,
+            @FormParam("profId") String profId,
             @FormParam("lastName") String lastName,
             @FormParam("firstName") String firstName,
             @FormParam("mobilePhone") String mobilePhone,
@@ -40,7 +41,7 @@ public class ProfessorAPI {
 
         ProfessorManager professorManager = new ProfessorManager();
 
-        String error = professorManager.addProf(availability, firstName, lastName, "",
+        String error = professorManager.addProf(profId, availability, firstName, lastName, "",
                 mobilePhone, email, gender, address, userName, password, secretQuestion,
                 secretAnswer, active);
 

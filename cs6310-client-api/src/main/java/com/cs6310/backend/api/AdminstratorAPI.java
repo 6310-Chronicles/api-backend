@@ -96,52 +96,6 @@ public class AdminstratorAPI {
     }
 
 
-    @POST
-    @Path("/addRoleToAdministrator")
-    @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
-    public Response addRoleToAdministrator(@FormParam("adminUUID") String adminUUID, @FormParam("roleUUID") String roleUUID) {
-        APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try {
-            AdministratorManager administratorManager = new AdministratorManager();
-            String response = administratorManager.addRoleToAdministrator(adminUUID, roleUUID);
-            if (response != null) {
-                payload.setStatus(ResponseStatus.OK);
-            } else {
-                payload.setStatus(ResponseStatus.FAILED);
-                payload.setErrorCause(response);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            payload.setStatus(ResponseStatus.FAILED);
-        }
-        return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
-    }
-
-
-    @POST
-    @Path("/removeRoleFromAdministrator")
-    @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
-    public Response removeRoleFromAdministrator(@FormParam("adminUUID") String adminUUID, @FormParam("roleUUID") String roleUUID) {
-        APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try {
-            AdministratorManager administratorManager = new AdministratorManager();
-            String response = administratorManager.removeRoleFromAdministrator(adminUUID, roleUUID);
-            if (response != null) {
-                payload.setStatus(ResponseStatus.OK);
-            } else {
-                payload.setStatus(ResponseStatus.FAILED);
-                payload.setErrorCause(response);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            payload.setStatus(ResponseStatus.FAILED);
-        }
-        return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
-    }
 
 
     @GET

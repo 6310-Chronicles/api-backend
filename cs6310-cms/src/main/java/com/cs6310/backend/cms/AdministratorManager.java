@@ -5,9 +5,6 @@ import com.cs6310.backend.helpers.Utils;
 import com.cs6310.backend.model.AccessCredential;
 import com.cs6310.backend.model.Administrator;
 import com.cs6310.backend.model.PersonDetails;
-import com.cs6310.backend.model.Role;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.apache.log4j.Logger;
 
 import javax.persistence.EntityManager;
@@ -219,88 +216,6 @@ public class AdministratorManager {
     }
 
 
-    /**
-     * Add role to an existing admin
-     *
-     * @param adminUUID
-     * @param roleUUID
-     * @return
-     */
-    public String addRoleToAdministrator(String adminUUID, String roleUUID) {
-
-        entityManager.getTransaction().begin();
-        try {
-
-            Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Administrator.getByUUID");
-            query.setParameter("uuid", adminUUID);
-
-            Administrator administrator = (Administrator) query.getSingleResult();
-
-
-            Query queryPrivilege = entityManager.createNamedQuery("com.cs6310.backend.model.Role.getByUUID");
-            queryPrivilege.setParameter("uuid", roleUUID);
-            Role role = (Role) queryPrivilege.getSingleResult();
-
-            administrator.getRoles().add(role);
-            role.getAdministrator().add(administrator);
-
-
-            entityManager.merge(role);
-            entityManager.getTransaction().commit();
-
-
-            return "OK";
-
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            return DatabaseUtil.getCauseMessage(e);
-        }
-    }
-
-
-    /**
-     * remove role from an existing admin
-     *
-     * @param adminUUID
-     * @param roleUUID
-     * @return
-     */
-    public String removeRoleFromAdministrator(String adminUUID, String roleUUID) {
-        boolean resp = false;
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        entityManager.getTransaction().begin();
-        try {
-
-            Query query = entityManager.createNamedQuery("com.cs6310.backend.model.Administrator.getByUUID");
-            query.setParameter("uuid", adminUUID);
-            Administrator administrator = (Administrator) query.getSingleResult();
-
-
-            Query queryPrivilege = entityManager.createNamedQuery("com.cs6310.backend.model.Role.getByUUID");
-            queryPrivilege.setParameter("uuid", roleUUID);
-            Role role = (Role) queryPrivilege.getSingleResult();
-
-            List<Role> roleList = administrator.getRoles();
-            int size = roleList.size();
-
-            for (int t = 0; t < size; t++) {
-                Role role1 = roleList.get(t);
-                if (role1.getUuid().equalsIgnoreCase(role.getUuid()))
-                    administrator.getRoles().remove(t);
-            }
-
-            entityManager.merge(administrator);
-            entityManager.getTransaction().commit();
-            resp = true;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            return DatabaseUtil.getCauseMessage(e);
-        }
-        return "OK";
-    }
 
 
     /**

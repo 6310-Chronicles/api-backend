@@ -4,8 +4,6 @@ import com.google.gson.annotations.Expose;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by nelson on 10/14/15.
@@ -20,7 +18,9 @@ import java.util.List;
         @NamedQuery(name = "com.cs6310.backend.model.Administrator.getByUUID",
                 query = "select obj from Administrator obj where obj.uuid =: uuid"),
         @NamedQuery(name = "com.cs6310.backend.model.Administrator.getByPersonalDetails",
-                query = "select obj from Administrator obj where obj.personDetails =: personalDetails")
+                query = "select obj from Administrator obj where obj.personDetails =: personalDetails"),
+        @NamedQuery(name = "com.cs6310.backend.model.Administrator.getByAdministratorId",
+                query = "select obj from Administrator obj where obj.administratorId =: administratorId")
 
 })
 
@@ -29,8 +29,6 @@ import java.util.List;
 public class Administrator implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-
 
     @Id
     @GeneratedValue
@@ -41,18 +39,12 @@ public class Administrator implements Serializable {
     private String uuid;
 
     @Expose
-    @Column
+    @Column(unique = true, nullable = false)
     private String administratorId;
-
 
     @Expose
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private PersonDetails personDetails;
-
-
-    @Expose
-    @ManyToMany(targetEntity = com.cs6310.backend.model.Role.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    private List<Role> roles = new ArrayList<>();
 
 
     @Expose
@@ -76,19 +68,6 @@ public class Administrator implements Serializable {
         this.personDetails = personDetails;
     }
 
-    public List<Role> getRoles() {
-
-        if (roles == null)
-            roles = new ArrayList<>();
-
-        return roles;
-    }
-
-    public void setRoles(List<Role> roles) {
-
-
-        this.roles = roles;
-    }
 
     public AccessCredential getAccessCredential() {
         return accessCredential;

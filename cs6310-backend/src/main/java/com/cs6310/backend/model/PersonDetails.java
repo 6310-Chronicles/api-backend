@@ -25,7 +25,6 @@ public class PersonDetails implements Serializable {
     @Expose
     @Column(unique = true)
     private String uuid;
-
     @Expose
     @Column
     private String firstName;

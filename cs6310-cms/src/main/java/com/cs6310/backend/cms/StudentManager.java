@@ -95,8 +95,6 @@ public class StudentManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -173,7 +171,6 @@ public class StudentManager {
         }
 
     }
-
 
 
     /**
@@ -628,5 +625,118 @@ public class StudentManager {
 
     }
 
+    public String addStudentCompletedCourseCSV(String studentId, String courseId) {
+        try {
+
+
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByStudentId");
+            query.setParameter("studentId", studentId);
+            Student student = (Student) query.getSingleResult();
+
+            Query querycourse = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Course.getCourseID");
+            querycourse.setParameter("courseId", courseId);
+            Course course = (Course) querycourse.getSingleResult();
+
+            student.getCompletedCourses().add(course);
+
+            entityManager.merge(student);
+            entityManager.getTransaction().commit();
+
+
+            return "OK";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        }
+    }
+
+    public String addStudentRecommendedCourseCSV(String studentId, String courseId) {
+        try {
+
+
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByStudentId");
+            query.setParameter("studentId", studentId);
+            Student student = (Student) query.getSingleResult();
+
+            Query querycourse = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Course.getCourseID");
+            querycourse.setParameter("courseId", courseId);
+            Course course = (Course) querycourse.getSingleResult();
+
+            student.getRecommendedCourses().add(course);
+
+            entityManager.merge(student);
+            entityManager.getTransaction().commit();
+
+
+            return "OK";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        }
+    }
+
+
+    public String addStudentInProgressCourseCSV(String studentId, String courseId) {
+        try {
+
+
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByStudentId");
+            query.setParameter("studentId", studentId);
+            Student student = (Student) query.getSingleResult();
+
+            Query querycourse = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Course.getCourseID");
+            querycourse.setParameter("courseId", courseId);
+            Course course = (Course) querycourse.getSingleResult();
+
+            student.getCoursesInProgress().add(course);
+
+            entityManager.merge(student);
+            entityManager.getTransaction().commit();
+
+
+            return "OK";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        }
+    }
+
+
+    public String addStudentPreferredCourseCSV(String studentId, String courseId) {
+        try {
+
+
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByStudentId");
+            query.setParameter("studentId", studentId);
+            Student student = (Student) query.getSingleResult();
+
+            Query querycourse = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Course.getCourseID");
+            querycourse.setParameter("courseId", courseId);
+            Course course = (Course) querycourse.getSingleResult();
+
+            student.getPreferedCoursesToBeOptimized().add(course);
+
+            entityManager.merge(student);
+            entityManager.getTransaction().commit();
+
+
+            return "OK";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        }
+    }
 
 }

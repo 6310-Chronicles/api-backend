@@ -10,9 +10,7 @@
         <class>com.cs6310.backend.model.Administrator</class>
         <class>com.cs6310.backend.model.Course</class>
         <class>com.cs6310.backend.model.PersonDetails</class>
-        <class>com.cs6310.backend.model.Privilege</class>
         <class>com.cs6310.backend.model.Professor</class>
-        <class>com.cs6310.backend.model.Role</class>
         <class>com.cs6310.backend.model.Semester</class>
         <class>com.cs6310.backend.model.Student</class>
         <class>com.cs6310.backend.model.TeachingAssistant</class>

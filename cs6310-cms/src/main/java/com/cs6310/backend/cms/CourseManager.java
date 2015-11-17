@@ -359,4 +359,101 @@ public class CourseManager {
     }
 
 
+    public String addCSVCourseData(String courseId, String hasPrerequisite, String mustBeOffered, String courseName, String priority,
+                                   String courseCredits, String maxEnrollment, String currentEnrollment) {
+        entityManager.getTransaction().begin();
+        try {
+
+            Course course = new Course();
+            course.setCourseId(courseId);
+            course.setHasPrerequisite(Utils.convertStringToBool(hasPrerequisite));
+            course.setMustBeOffered(Utils.convertStringToBool(mustBeOffered));
+            course.setCourseName(courseName);
+            course.setCourseCredits(Utils.convertIntegerToString(courseCredits));
+            course.setMaximumEnrollment(Utils.convertIntegerToString(maxEnrollment));
+            course.setCurrentEnrollment(Utils.convertIntegerToString(currentEnrollment));
+            course.setPriority(Utils.convertIntegerToString(priority));
+            course.setUuid(String.valueOf(UUID.randomUUID()));
+
+            entityManager.persist(course);
+
+            entityManager.getTransaction().commit();
+            return "OK";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+
+        }
+
+
+    }
+
+    public String addCSVSemesterData(String courseId, String semesterName) {
+        try {
+
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Course.getCourseID");
+            query.setParameter("courseId", courseId);
+            Course course = (Course) query.getSingleResult();
+
+
+            Query querycourse = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Semester.getByName");
+
+            querycourse.setParameter("name", semesterName);
+
+            Semester semester = (Semester) querycourse.getSingleResult();
+
+
+            course.getOfferedInSemester().add(semester);
+
+            entityManager.merge(course);
+
+            entityManager.getTransaction().commit();
+
+            return "OK";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        }
+
+
+    }
+
+    public String addCSVPrerequisiteData(String courseId,
+                                         String prerequisite) {
+
+
+        try {
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Course.getCourseID");
+            query.setParameter("courseId", courseId);
+            Course course = (Course) query.getSingleResult();
+
+
+            Query querycourse = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Course.getCourseID");
+            querycourse.setParameter("courseId", prerequisite);
+            Course course2 = (Course) querycourse.getSingleResult();
+
+
+            if (!course2.getUuid().equalsIgnoreCase(course.getUuid())) {
+                course.getListOfPrerequisiteCourses().add(course2);
+
+                entityManager.merge(course);
+                entityManager.getTransaction().commit();
+            }
+
+            return "OK";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        }
+
+    }
+
+
 }

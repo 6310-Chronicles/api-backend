@@ -330,4 +330,94 @@ public class TeachingAssistantManager {
 
     }
 
+
+    public String addTeachingAssistantCSV(String studentId) {
+
+
+        try {
+            entityManager.getTransaction().begin();
+
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByStudentId");
+            query.setParameter("studentId", studentId);
+            Student student = (Student) query.getSingleResult();
+
+            TeachingAssistant ta = new TeachingAssistant();
+
+            ta.setStudent(student);
+            ta.setUuid(String.valueOf(UUID.randomUUID()));
+
+            entityManager.persist(ta);
+            entityManager.getTransaction().commit();
+            return "OK";
+        } catch (RollbackException e) {
+            e.printStackTrace();
+
+            return DatabaseUtil.getCauseMessage(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return DatabaseUtil.getCauseMessage(e);
+        }
+
+    }
+
+
+    public String addTAAssitingCourseCSV(String studentId, String courseId) {
+        try {
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.TeachingAssistant.getByStudentId");
+            query.setParameter("studentId", studentId);
+            TeachingAssistant teachingAssistant = (TeachingAssistant) query.getSingleResult();
+
+
+            Query querycourse = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Course.getCourseID");
+            querycourse.setParameter("courseId", courseId);
+            Course course = (Course) querycourse.getSingleResult();
+
+            teachingAssistant.getAssisting().add(course);
+
+            entityManager.merge(teachingAssistant);
+            entityManager.getTransaction().commit();
+
+            return "OK";
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        }
+
+    }
+
+    public String addTACompetencyCourseCSV(String studentId, String courseId) {
+        try {
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.TeachingAssistant.getByStudentId");
+            query.setParameter("studentId", studentId);
+            TeachingAssistant teachingAssistant = (TeachingAssistant) query.getSingleResult();
+
+
+            Query querycourse = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Course.getCourseID");
+            querycourse.setParameter("courseId", courseId);
+            Course course = (Course) querycourse.getSingleResult();
+
+            teachingAssistant.getCompetency().add(course);
+
+            entityManager.merge(teachingAssistant);
+            entityManager.getTransaction().commit();
+
+            return "OK";
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        }
+
+    }
+
+
 }

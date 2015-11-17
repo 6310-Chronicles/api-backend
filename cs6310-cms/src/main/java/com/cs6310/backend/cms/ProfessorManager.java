@@ -49,13 +49,13 @@ public class ProfessorManager {
      */
 
 
-    public String addProf(String available, String firstName, String lastName, String profilePic,
+    public String addProf(String profId, String available, String firstName, String lastName, String profilePic,
                           String mobilePhone, String email, String gender, String address, String username, String password, String secretQuestion,
                           String secretAnswer, String active) {
 
 
         Professor professor = new Professor();
-
+        professor.setProfId(profId);
         professor.setAvailable(Utils.convertStringToBool(available));
 
         PersonDetails personDetails = new PersonDetails();
@@ -449,6 +449,64 @@ public class ProfessorManager {
         }
 
     }
+
+
+    public String addProfCompetentCourseCSV(String profId, String courseId) {
+        try {
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Professor.getByProfId");
+            query.setParameter("profId", profId);
+            Professor professor = (Professor) query.getSingleResult();
+
+            Query querycourse = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Course.getCourseID");
+            querycourse.setParameter("courseId", courseId);
+            Course course = (Course) querycourse.getSingleResult();
+
+            professor.getCompetentCourseList().add(course);
+
+            entityManager.merge(professor);
+            entityManager.getTransaction().commit();
+
+            return "OK";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
+        }
+
+    }
+
+    public String addProfTeachingCourseCSV(String profId, String courseId) {
+        try {
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Professor.getByProfId");
+            query.setParameter("profId", profId);
+            Professor professor = (Professor) query.getSingleResult();
+
+            Query querycourse = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Course.getCourseID");
+            querycourse.setParameter("courseId", courseId);
+            Course course = (Course) querycourse.getSingleResult();
+
+            professor.getTeachingCourseList().add(course);
+
+            entityManager.merge(professor);
+            entityManager.getTransaction().commit();
+
+            return "OK";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DatabaseUtil.getCauseMessage(e);
+        } finally {
+            entityManager.close();
+        }
+
+    }
+
 
 
 }

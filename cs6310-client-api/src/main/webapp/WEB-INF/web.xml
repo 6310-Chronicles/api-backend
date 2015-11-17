@@ -10,8 +10,56 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
+	<servlet>
+		<servlet-name>com.cs6310.backend.servlet.AdministratorUploader</servlet-name>
+		<servlet-class>com.cs6310.backend.servlet.AdministratorUploader</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>com.cs6310.backend.servlet.CourseSemesterUploader</servlet-name>
+		<servlet-class>com.cs6310.backend.servlet.CourseSemesterUploader</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>com.cs6310.backend.servlet.ProfessorsUploader</servlet-name>
+		<servlet-class>com.cs6310.backend.servlet.ProfessorsUploader</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>com.cs6310.backend.servlet.StudentsUploader</servlet-name>
+		<servlet-class>com.cs6310.backend.servlet.StudentsUploader</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>com.cs6310.backend.servlet.TeachingAssistantUploader</servlet-name>
+		<servlet-class>com.cs6310.backend.servlet.TeachingAssistantUploader</servlet-class>
+	</servlet>
+
+
 	<servlet-mapping>
 		<servlet-name>javax.ws.rs.core.Application</servlet-name>
 		<url-pattern>/api/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>com.cs6310.backend.servlet.AdministratorUploader</servlet-name>
+		<url-pattern>/uploadAdministrators</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>com.cs6310.backend.servlet.CourseSemesterUploader</servlet-name>
+		<url-pattern>/uploadCourseSemesters</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>com.cs6310.backend.servlet.ProfessorsUploader</servlet-name>
+		<url-pattern>/uploadProfessors</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>com.cs6310.backend.servlet.StudentsUploader</servlet-name>
+		<url-pattern>/uploadStudents</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>com.cs6310.backend.servlet.TeachingAssistantUploader</servlet-name>
+		<url-pattern>/uploadTeachingAssistants</url-pattern>
 	</servlet-mapping>
 </web-app>

@@ -162,6 +162,7 @@ public class CourseAPI {
     public Response removeCourseSemester(@FormParam("courseUUID") String courseUUID, @FormParam("semesterUUID") String semesterUUID) {
         APIResponse payload = new APIResponse();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
         try {
             CourseManager courseManager = new CourseManager();
             String response = courseManager.removeCourseSemester(courseUUID, semesterUUID);

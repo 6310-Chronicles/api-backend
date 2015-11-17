@@ -19,7 +19,9 @@ import java.util.List;
         @NamedQuery(name = "com.cs6310.backend.model.Professor.getByUUID",
                 query = "select obj from Professor obj where obj.uuid =: uuid"),
         @NamedQuery(name = "com.cs6310.backend.model.Professor.getByPersonalDetails",
-                query = "select obj from Professor obj where obj.personDetails =: personalDetails")
+                query = "select obj from Professor obj where obj.personDetails =: personalDetails"),
+        @NamedQuery(name = "com.cs6310.backend.model.Professor.getByProfId",
+                query = "select obj from Professor obj where obj.profId =: profId")
 })
 @Entity
 @Table(name = "professor")
@@ -35,6 +37,10 @@ public class Professor implements Serializable {
     @Expose
     @Column(unique = true)
     private String uuid;
+
+    @Expose
+    @Column(unique = true)
+    private String profId;
 
     @Expose
     private boolean available;
@@ -113,5 +119,13 @@ public class Professor implements Serializable {
 
     public void setCompetentCourseList(List<Course> competentCourseList) {
         this.competentCourseList = competentCourseList;
+    }
+
+    public String getProfId() {
+        return profId;
+    }
+
+    public void setProfId(String profId) {
+        this.profId = profId;
     }
 }

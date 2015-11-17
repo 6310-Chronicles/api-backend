@@ -1,7 +1,6 @@
 package com.cs6310.backend.api;
 
 import com.cs6310.backend.cms.SemesterManager;
-import com.cs6310.backend.model.Role;
 import com.cs6310.backend.model.Semester;
 import com.cs6310.backend.response.APIResponse;
 import com.cs6310.backend.response.ResponseStatus;
@@ -21,6 +20,7 @@ import java.util.List;
 @Path("/semester")
 public class SemesterAPI {
 
+//http://jsfiddle.net/clickthelink/Uwcuz/1/
 
     @POST
     @Path("/create")
@@ -31,7 +31,7 @@ public class SemesterAPI {
         String error = semesterManager.addSemester(name, year);
 
         APIResponse payload = new APIResponse();
-        if (error == null) {
+        if (error != null) {
             payload.setStatus(ResponseStatus.OK);
         } else {
             payload.setStatus(ResponseStatus.FAILED);
@@ -40,7 +40,6 @@ public class SemesterAPI {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(payload);
-
         return Response.ok(json, MediaType.APPLICATION_JSON).build();
     }
 
@@ -56,7 +55,7 @@ public class SemesterAPI {
 
             if (roles != null) {
                 payload.setStatus(ResponseStatus.OK);
-                payload.setResult(new ArrayList<Role>(roles));
+                payload.setResult(new ArrayList<Semester>(roles));
             } else {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause("Failed to fetch Semesters");
