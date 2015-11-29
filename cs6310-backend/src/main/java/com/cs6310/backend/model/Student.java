@@ -25,58 +25,59 @@ import java.util.List;
 @Table(name = "student")
 public class Student implements Serializable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
-
-
     @Id
     @GeneratedValue
     private int id;
-
     @Expose
     @Column
     private String uuid;
-
     @Expose
     @Column(unique = true)
     private String studentId;
-
     @Expose
     @Column
     private String studentStatus;
-
     @Expose
     @Column
-    private Integer maxCourses;
-
-
+    private String studentName;
+    @Expose
+    @Column
+    private int maxCourses;
     @Expose
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private PersonDetails personDetails;
-
     @Expose
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private AccessCredential accessCredential;
-
     @Expose
     @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,})
     private List<Course> completedCourses = new ArrayList<>();
-
-
     @Expose
     @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,})
     private List<Course> recommendedCourses = new ArrayList<>();
-
     @Expose
     @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,})
     private List<Course> coursesInProgress = new ArrayList<>();
-
     @Expose
     @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,})
     private List<Course> preferedCoursesToBeOptimized = new ArrayList<>();
 
+    /**
+     *
+     */
+
+
+    public Student() {
+    }
+
+
+    // Added by Duy - START
+    public Student(String studentId, String studentName, int maxCourses) {
+        this.studentId = studentId;
+        this.studentName = studentName;
+        this.maxCourses = maxCourses;
+    }
 
     public int getId() {
         return id;
@@ -102,7 +103,6 @@ public class Student implements Serializable {
         this.personDetails = personDetails;
     }
 
-
     public AccessCredential getAccessCredential() {
         return accessCredential;
     }
@@ -110,7 +110,6 @@ public class Student implements Serializable {
     public void setAccessCredential(AccessCredential accessCredential) {
         this.accessCredential = accessCredential;
     }
-
 
     public String getStudentId() {
         return studentId;
@@ -128,11 +127,11 @@ public class Student implements Serializable {
         this.studentStatus = studentStatus;
     }
 
-    public Integer getMaxCourses() {
+    public int getMaxCourses() {
         return maxCourses;
     }
 
-    public void setMaxCourses(Integer maxCourses) {
+    public void setMaxCourses(int maxCourses) {
         this.maxCourses = maxCourses;
     }
 
@@ -178,4 +177,23 @@ public class Student implements Serializable {
     public void setPreferedCoursesToBeOptimized(List<Course> preferedCoursesToBeOptimized) {
         this.preferedCoursesToBeOptimized = preferedCoursesToBeOptimized;
     }
+
+    // Ensure at least a 1 or greater return. More classes taken implies greater
+    // seniority.
+    public int getSeniority() {
+        return (completedCourses.size() + coursesInProgress.size() + 1);
+    }
+
+    // Added by Duy
+    public String getStudentName() {
+        return studentName;
+    }
+
+    // Added by Duy
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
+    }
+
+
+
 }

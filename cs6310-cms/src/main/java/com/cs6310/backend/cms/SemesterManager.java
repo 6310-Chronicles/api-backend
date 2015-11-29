@@ -27,14 +27,15 @@ public class SemesterManager {
      * @param name
      * @return
      */
-    public String addSemester(String name, String year) {
+    public String addSemester(String name, String year, String semesterId) {
 
         entityManager.getTransaction().begin();
         try {
 
-            Semester semester = new Semester();
+            Semester semester = new Semester(semesterId, name);
             semester.setName(name);
             semester.setYear(year);
+            semester.setSemesterId(semesterId);
             semester.setUuid(String.valueOf(UUID.randomUUID()));
 
             entityManager.persist(semester);
@@ -57,7 +58,7 @@ public class SemesterManager {
      *
      * @return
      */
-    public List getAllSemesters() {
+    public List<Semester> getAllSemesters() {
         entityManager.getTransaction().begin();
 
         Query query = entityManager

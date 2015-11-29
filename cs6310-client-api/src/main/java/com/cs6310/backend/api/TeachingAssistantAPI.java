@@ -6,7 +6,6 @@ import com.cs6310.backend.response.APIResponse;
 import com.cs6310.backend.response.ResponseStatus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -20,6 +19,7 @@ public class TeachingAssistantAPI {
     @POST
     @Path("/create")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response create(
             @FormParam("studentId") String studentId) {
 
@@ -36,19 +36,21 @@ public class TeachingAssistantAPI {
             payload.setErrorCause(error);
         }
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
         String json = gson.toJson(payload);
 
-
-        return Response.ok(json, MediaType.APPLICATION_JSON).build();
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
     }
 
     @POST
     @Path("/addTACompetentCourse")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response addTACompetentCourse(@FormParam("taUUID") String taUUID, @FormParam("courseUUID") String courseUUID) {
         APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
             TeachingAssistantManager teachingAssistantManager = new TeachingAssistantManager();
             String response = teachingAssistantManager.addTACompetentCourse(taUUID, courseUUID);
@@ -58,21 +60,27 @@ public class TeachingAssistantAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(response);
             }
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
+
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
+        String json = gson.toJson(payload);
+
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
 
     }
 
     @POST
     @Path("/removeTACompetentCourse")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response removeTACompetentCourse(@FormParam("taUUID") String taUUID, @FormParam("courseUUID") String courseUUID) {
         APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
             TeachingAssistantManager teachingAssistantManager = new TeachingAssistantManager();
             String response = teachingAssistantManager.removeTACompetentCourse(taUUID, courseUUID);
@@ -82,21 +90,27 @@ public class TeachingAssistantAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(response);
             }
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
+        String json = gson.toJson(payload);
+
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
     }
 
 
     @POST
     @Path("/addTAAssistingCourse")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response addTAAssistingCourse(@FormParam("taUUID") String taUUID, @FormParam("courseUUID") String courseUUID) {
         APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
             TeachingAssistantManager teachingAssistantManager = new TeachingAssistantManager();
             String response = teachingAssistantManager.addTAAssistingCourse(taUUID, courseUUID);
@@ -106,22 +120,26 @@ public class TeachingAssistantAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(response);
             }
-
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
+        String json = gson.toJson(payload);
+
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
     }
 
 
     @POST
     @Path("/removeTAAssistingCourse")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response removeTAAssistingCourse(@FormParam("taUUID") String taUUID, @FormParam("courseUUID") String courseUUID) {
         APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
             TeachingAssistantManager teachingAssistantManager = new TeachingAssistantManager();
             String response = teachingAssistantManager.removeTAAssistingCourse(taUUID, courseUUID);
@@ -132,21 +150,26 @@ public class TeachingAssistantAPI {
                 payload.setErrorCause(response);
             }
 
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
+        String json = gson.toJson(payload);
+
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
     }
 
 
     @GET
     @Path("/allTeachingAssistant")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getAllTeachingAssistant() {
         APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
-
         TeachingAssistantManager teachingAssistantManager = new TeachingAssistantManager();
 
 
@@ -160,22 +183,29 @@ public class TeachingAssistantAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(" This :" + list + " does not exist");
             }
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
-            }.getType())).build();
+
         } catch (Exception e) {
             e.printStackTrace();
             payload = new APIResponse();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
+
         }
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
+        String json = gson.toJson(payload);
+
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
     }
 
 
     @GET
     @Path("/teachingAssistant/{uuid}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getAdmin(@PathParam("uuid") String uuid) {
         APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 
         TeachingAssistantManager teachingAssistantManager = new TeachingAssistantManager();
 
@@ -189,22 +219,28 @@ public class TeachingAssistantAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(" This :" + teachingAssistant + " does not exist");
             }
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
-            }.getType())).build();
+
         } catch (Exception e) {
             payload = new APIResponse();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
+        String json = gson.toJson(payload);
+
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
     }
 
 
     @POST
     @Path("/deleteTeachingAssistantByUUID")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response deleteCourseByUUID(@FormParam("uuid") String uuid) {
         APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
 
             TeachingAssistantManager teachingAssistantManager = new TeachingAssistantManager();
@@ -217,12 +253,18 @@ public class TeachingAssistantAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(response);
             }
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
+        String json = gson.toJson(payload);
+
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
     }
 
 

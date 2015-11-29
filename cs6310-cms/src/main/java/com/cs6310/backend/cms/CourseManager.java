@@ -43,7 +43,7 @@ public class CourseManager {
         entityManager.getTransaction().begin();
         try {
 
-            Course course = new Course();
+            Course course = new Course(courseId);
             course.setCourseId(courseId);
             course.setHasPrerequisite(Utils.convertStringToBool(hasPrerequisite));
             course.setMustBeOffered(Utils.convertStringToBool(mustBeOffered));
@@ -63,10 +63,7 @@ public class CourseManager {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
 
-        } finally {
-            entityManager.close();
         }
-
 
         return null;
 
@@ -121,8 +118,6 @@ public class CourseManager {
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -160,10 +155,7 @@ public class CourseManager {
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
-
 
     }
 
@@ -243,8 +235,6 @@ public class CourseManager {
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
 
@@ -334,8 +324,6 @@ public class CourseManager {
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
 
@@ -359,12 +347,37 @@ public class CourseManager {
     }
 
 
-    public String addCSVCourseData(String courseId, String hasPrerequisite, String mustBeOffered, String courseName, String priority,
-                                   String courseCredits, String maxEnrollment, String currentEnrollment) {
-        entityManager.getTransaction().begin();
+    public Course contains(String courseId) {
+
         try {
 
-            Course course = new Course();
+
+            entityManager.getTransaction().begin();
+            Query query = entityManager
+                    .createNamedQuery("com.cs6310.backend.model.Course.getCourseID");
+            query.setParameter("courseId", courseId);
+            Course course = (Course) query.getSingleResult();
+
+            entityManager.getTransaction().commit();
+            if (course != null) {
+                return course;
+            } else {
+                return null;
+            }
+
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
+
+
+    public String addCSVCourseData(String courseId, String hasPrerequisite, String mustBeOffered, String courseName, String priority,
+                                   String courseCredits, String maxEnrollment, String currentEnrollment) {
+
+        try {
+
+            Course course = new Course(courseId);
             course.setCourseId(courseId);
             course.setHasPrerequisite(Utils.convertStringToBool(hasPrerequisite));
             course.setMustBeOffered(Utils.convertStringToBool(mustBeOffered));
@@ -375,9 +388,13 @@ public class CourseManager {
             course.setPriority(Utils.convertIntegerToString(priority));
             course.setUuid(String.valueOf(UUID.randomUUID()));
 
+            entityManager.getTransaction().begin();
+
             entityManager.persist(course);
 
             entityManager.getTransaction().commit();
+
+
             return "OK";
 
         } catch (Exception e) {
@@ -387,10 +404,12 @@ public class CourseManager {
         }
 
 
+
     }
 
     public String addCSVSemesterData(String courseId, String semesterName) {
         try {
+
 
             entityManager.getTransaction().begin();
             Query query = entityManager
@@ -398,11 +417,12 @@ public class CourseManager {
             query.setParameter("courseId", courseId);
             Course course = (Course) query.getSingleResult();
 
-
             Query querycourse = entityManager
-                    .createNamedQuery("com.cs6310.backend.model.Semester.getByName");
+                    .createNamedQuery("com.cs6310.backend.model.Semester.getById");
 
-            querycourse.setParameter("name", semesterName);
+            querycourse.setParameter("semesterId", "20161");
+
+//            querycourse.setParameter("name", semesterName);
 
             Semester semester = (Semester) querycourse.getSingleResult();
 

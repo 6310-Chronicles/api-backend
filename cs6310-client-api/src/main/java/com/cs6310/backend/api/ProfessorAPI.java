@@ -6,7 +6,6 @@ import com.cs6310.backend.response.APIResponse;
 import com.cs6310.backend.response.ResponseStatus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -17,12 +16,14 @@ import java.util.List;
  * Created by nelson on 11/6/15.
  */
 @Path("/professor")
+
 public class ProfessorAPI {
 
 
     @POST
     @Path("/create")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response create(
             @FormParam("availability") String availability,
             @FormParam("profId") String profId,
@@ -53,16 +54,20 @@ public class ProfessorAPI {
             payload.setErrorCause(error);
         }
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
         String json = gson.toJson(payload);
 
-
-        return Response.ok(json, MediaType.APPLICATION_JSON).build();
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
     }
 
     @POST
     @Path("/update")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response update(
             @FormParam("uuid") String uuid,
             @FormParam("availability") String availability,
@@ -93,16 +98,20 @@ public class ProfessorAPI {
             payload.setErrorCause(error);
         }
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
         String json = gson.toJson(payload);
 
-
-        return Response.ok(json, MediaType.APPLICATION_JSON).build();
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
     }
 
 
     @GET
     @Path("/allProfessors")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getAllProfessors() {
         APIResponse payload = new APIResponse();
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
@@ -120,19 +129,30 @@ public class ProfessorAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(" This :" + list + " does not exist");
             }
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
-            }.getType())).build();
+
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
         } catch (Exception e) {
             e.printStackTrace();
             payload = new APIResponse();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
         }
     }
 
 
     @GET
     @Path("/professor/{uuid}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getProfessor(@PathParam("uuid") String uuid) {
         APIResponse payload = new APIResponse();
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
@@ -151,13 +171,22 @@ public class ProfessorAPI {
             }
 
 
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
-            }.getType())).build();
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
+
         } catch (Exception e) {
             e.printStackTrace();
             payload = new APIResponse();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
         }
     }
 
@@ -165,9 +194,10 @@ public class ProfessorAPI {
     @POST
     @Path("/deleteProfessorByUUID")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response deleteProfessorByUUID(@FormParam("uuid") String uuid) {
         APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
         try {
             ProfessorManager professorManager = new ProfessorManager();
             String response = professorManager.deleteProfessorByUUID(uuid);
@@ -178,12 +208,23 @@ public class ProfessorAPI {
                 payload.setErrorCause(response);
             }
 
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
         } catch (Exception e) {
             e.printStackTrace();
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
+
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
         }
 
 
@@ -193,9 +234,10 @@ public class ProfessorAPI {
     @POST
     @Path("/addProfCompetentCourse")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response addProfCompetentCourse(@FormParam("profUUID") String profUUID, @FormParam("courseUUID") String courseUUID) {
         APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
         try {
             ProfessorManager professorManager = new ProfessorManager();
             String response = professorManager.addProfCompetentCourse(profUUID, courseUUID);
@@ -206,11 +248,22 @@ public class ProfessorAPI {
                 payload.setErrorCause(response);
             }
 
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
+
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
         }
 
     }
@@ -219,9 +272,10 @@ public class ProfessorAPI {
     @POST
     @Path("/removeProfCompetentCourse")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response removeProfCompetentCourse(@FormParam("profUUID") String profUUID, @FormParam("courseUUID") String courseUUID) {
         APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
         try {
             ProfessorManager professorManager = new ProfessorManager();
             String response = professorManager.removeProfCompetentCourse(profUUID, courseUUID);
@@ -231,11 +285,23 @@ public class ProfessorAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(response);
             }
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
+
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
+
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
         }
 
     }
@@ -244,9 +310,12 @@ public class ProfessorAPI {
     @POST
     @Path("/addProfTeachingCourse")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response addProfTeachingCourse(@FormParam("profUUID") String profUUID, @FormParam("courseUUID") String courseUUID) {
         APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
         try {
             ProfessorManager professorManager = new ProfessorManager();
             String response = professorManager.addProfTeachingCourse(profUUID, courseUUID);
@@ -256,11 +325,23 @@ public class ProfessorAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(response);
             }
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
+
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
+
         } catch (Exception e) {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
         }
 
     }
@@ -269,9 +350,11 @@ public class ProfessorAPI {
     @POST
     @Path("/removeProfTeachingCourse")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response removeProfTeachingCourse(@FormParam("profUUID") String profUUID, @FormParam("courseUUID") String courseUUID) {
         APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
         try {
             ProfessorManager professorManager = new ProfessorManager();
             String response = professorManager.removeProfTeachingCourse(profUUID, courseUUID);
@@ -281,12 +364,24 @@ public class ProfessorAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(response);
             }
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
 
         } catch (Exception e) {
+
             e.printStackTrace();
+
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
         }
     }
 

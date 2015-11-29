@@ -22,30 +22,27 @@ import java.util.List;
 @Table(name = "teachingassistant")
 public class TeachingAssistant implements Serializable {
 
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue
     private int id;
-
     @Expose
     @Column(unique = true)
     private String uuid;
-
     @Expose
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Student student;
-
-
     @Expose
     @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,})
     private List<Course> competency = new ArrayList<>();
-
-
     @Expose
     @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE,})
     private List<Course> assisting = new ArrayList<>();
 
+
+    public TeachingAssistant() {
+    }
 
     public String getUuid() {
         return uuid;

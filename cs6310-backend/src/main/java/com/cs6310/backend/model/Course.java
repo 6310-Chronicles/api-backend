@@ -46,23 +46,25 @@ public class Course implements Serializable {
     private String courseName;
 
     @Expose
-    private Integer priority;
+    private int priority;
 
     @Expose
     private Integer courseCredits;
 
     @Expose
-    private Integer maximumEnrollment;
+    private int maximumEnrollment;
 
     @Expose
     private Integer currentEnrollment;
-
     @Expose
     @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "COURSE_PREREQUISITE",
             joinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "prerequisite_id", referencedColumnName = "id"))
     private List<Course> prerequisites = new ArrayList();
+    @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "prerequisites")
+    private List<Course> prerequisitesData = new ArrayList();
 
 
 //    @ManyToMany
@@ -70,52 +72,55 @@ public class Course implements Serializable {
 //            joinColumns= @JoinColumn(name="user_id", referencedColumnName="id"),
 //            inverseJoinColumns=  @JoinColumn(name="fan_id",referencedColumnName="id"))
 //    private List myFans = new ArrayList();
-
-
-    @ManyToMany(targetEntity = com.cs6310.backend.model.Course.class,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "prerequisites")
-    private List<Course> prerequisitesData = new ArrayList();
-
-
     @Expose
     @ManyToMany(targetEntity = com.cs6310.backend.model.Semester.class, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private List<Semester> offeredInSemester = new ArrayList<>();
-
-
     @ManyToMany(targetEntity = com.cs6310.backend.model.Professor.class,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "competentCourseList")
     private List<Professor> professorCompetency = new ArrayList<>();
-
     @ManyToMany(targetEntity = com.cs6310.backend.model.Professor.class,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "teachingCourseList")
     private List<Professor> professorsTeaching = new ArrayList<>();
-
-
     @ManyToMany(targetEntity = com.cs6310.backend.model.Student.class,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "completedCourses")
     private List<Student> studentCompleted = new ArrayList<>();
-
     @ManyToMany(targetEntity = com.cs6310.backend.model.Student.class,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "recommendedCourses")
     private List<Student> studentRecommended = new ArrayList<>();
-
-
     @ManyToMany(targetEntity = com.cs6310.backend.model.Student.class,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "coursesInProgress")
     private List<Student> studentProgress = new ArrayList<>();
-
     @ManyToMany(targetEntity = com.cs6310.backend.model.Student.class,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "preferedCoursesToBeOptimized")
     private List<Student> studentPreferred = new ArrayList<>();
-
     @ManyToMany(targetEntity = com.cs6310.backend.model.TeachingAssistant.class,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "competency")
     private List<TeachingAssistant> teachingAssistantCompetency = new ArrayList<>();
-
     @ManyToMany(targetEntity = com.cs6310.backend.model.TeachingAssistant.class,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "assisting")
     private List<TeachingAssistant> teachingAssistantAssisting = new ArrayList<>();
 
+    public Course() {
+    }
+
+
+    // Added by DUY
+    public Course(String courseId) {
+        this.courseId = courseId;
+    }
+
+    // Added by DUY
+    public Course(String courseId, String courseName) {
+        this.courseId = courseId;
+        this.courseName = courseName;
+    }
+
+    // Added by DUY
+    public Course(String courseId, String courseName, int priority) {
+        this.courseId = courseId;
+        this.courseName = courseName;
+        this.priority = priority;
+    }
 
     public String getUuid() {
         return uuid;
@@ -181,8 +186,6 @@ public class Course implements Serializable {
         this.currentEnrollment = currentEnrollment;
     }
 
-
-
     public List<Semester> getOfferedInSemester() {
         if (offeredInSemester == null)
             offeredInSemester = new ArrayList<>();
@@ -208,4 +211,6 @@ public class Course implements Serializable {
     public void setListOfPrerequisiteCourses(List<Course> prerequisites) {
         this.prerequisites = prerequisites;
     }
+
+
 }

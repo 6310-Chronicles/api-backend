@@ -42,25 +42,16 @@ public class CourseSemesterUploader extends HttpServlet {
 
                     SemesterManager semesterManager = new SemesterManager();
 
-                    for (CoursesSemestersCSV coursesSemestersCSV : coursesSemestersCSVs) {
-
-                        String semesters = coursesSemestersCSV.semesterName;
-
-                        if (semesters.length() > 0 && !semesters.equalsIgnoreCase("0")) {
-                            if (semesters.length() > 0 && semesters.contains("-")) {
-                                String[] data = semesters.split("-");
-                                for (String name : data) {
-                                    semesterManager.addSemester(name, coursesSemestersCSV.semesterYear);
-                                }
-                            } else if (semesters.length() > 0) {
-                                semesterManager.addSemester(semesters, coursesSemestersCSV.semesterYear);
-                            }
-                        }
-                    }
 
                     CourseManager courseManager = new CourseManager();
 
                     for (CoursesSemestersCSV coursesSemestersCSV : coursesSemestersCSVs) {
+
+                        System.out.println(">>>>>>>>>>>>>" + coursesSemestersCSV.courseId);
+                        System.out.println(">>>>>>>>>>>>>" + coursesSemestersCSV.courseName);
+
+
+                        System.out.println(">>>>>>DDDDDDDD>>>>>>>" + coursesSemestersCSV.courseName);
 
                         courseManager.addCSVCourseData(coursesSemestersCSV.courseId, coursesSemestersCSV.hasPrerequisite, coursesSemestersCSV.mustBeOffered,
                                 coursesSemestersCSV.courseName, coursesSemestersCSV.priority, coursesSemestersCSV.courseCredits, coursesSemestersCSV.maxEnrollment, coursesSemestersCSV.currentEnrollment);
@@ -70,25 +61,43 @@ public class CourseSemesterUploader extends HttpServlet {
                     for (CoursesSemestersCSV coursesSemestersCSV : coursesSemestersCSVs) {
 
                         String semesters = coursesSemestersCSV.semesterName;
+
                         if (semesters.length() > 0 && !semesters.equalsIgnoreCase("0")) {
                             if (semesters.length() > 0 && semesters.contains("-")) {
                                 String[] data = semesters.split("-");
                                 for (String name : data) {
-                                    courseManager.addCSVSemesterData(coursesSemestersCSV.courseId, name);
+                                    semesterManager.addSemester(name, coursesSemestersCSV.semesterYear, coursesSemestersCSV.semesterId);
                                 }
                             } else if (semesters.length() > 0) {
-                                courseManager.addCSVSemesterData(coursesSemestersCSV.courseId, semesters);
+                                semesterManager.addSemester(semesters, coursesSemestersCSV.semesterYear, coursesSemestersCSV.semesterId);
                             }
                         }
-
                     }
+
 
                     for (CoursesSemestersCSV coursesSemestersCSV : coursesSemestersCSVs) {
-                        if (!coursesSemestersCSV.prerequisite.equalsIgnoreCase("0")) {
-                            courseManager.addCSVPrerequisiteData(coursesSemestersCSV.courseId, coursesSemestersCSV.prerequisite);
 
+                        String semesters = coursesSemestersCSV.semesterName;
+                        if (semesters.length() > 0 && !semesters.equalsIgnoreCase("0")) {
+//                            if (semesters.length() > 0 && semesters.contains("-")) {
+//                                String[] data = semesters.split("-");
+//                                for (String name : data) {
+//                                    courseManager.addCSVSemesterData(coursesSemestersCSV.courseId, name);
+//                                }
+//                            } else if (semesters.length() > 0) {
+
+                            courseManager.addCSVSemesterData(coursesSemestersCSV.courseId.trim(), semesters.trim());
+//                            }
                         }
+
                     }
+
+//                    for (CoursesSemestersCSV coursesSemestersCSV : coursesSemestersCSVs) {
+//                        if (!coursesSemestersCSV.prerequisite.equalsIgnoreCase("0")) {
+//                            courseManager.addCSVPrerequisiteData(coursesSemestersCSV.courseId, coursesSemestersCSV.prerequisite);
+//
+//                        }
+//                    }
 
 
                 }
@@ -179,6 +188,10 @@ public class CourseSemesterUploader extends HttpServlet {
 
             if (user.containsKey("SEMESTERNAME")) {
                 data.semesterName = (String) user.get("SEMESTERNAME");
+            }
+
+            if (user.containsKey("SEMESTERID")) {
+                data.semesterId = (String) user.get("SEMESTERID");
             }
 
             if (user.containsKey("SEMESTERYEAR")) {

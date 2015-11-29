@@ -6,7 +6,6 @@ import com.cs6310.backend.response.APIResponse;
 import com.cs6310.backend.response.ResponseStatus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -20,15 +19,14 @@ import java.util.List;
 @Path("/semester")
 public class SemesterAPI {
 
-//http://jsfiddle.net/clickthelink/Uwcuz/1/
-
     @POST
     @Path("/create")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response create(
             @FormParam("name") String name, @FormParam("year") String year) {
         SemesterManager semesterManager = new SemesterManager();
-        String error = semesterManager.addSemester(name, year);
+        String error = semesterManager.addSemester(name, year, "");
 
         APIResponse payload = new APIResponse();
         if (error != null) {
@@ -38,17 +36,21 @@ public class SemesterAPI {
             payload.setErrorCause(error);
         }
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
         String json = gson.toJson(payload);
-        return Response.ok(json, MediaType.APPLICATION_JSON).build();
+
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
     }
 
 
     @GET
     @Path("/semesters")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getSemesters() {
         APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
         SemesterManager semesterManager = new SemesterManager();
         try {
             List roles = semesterManager.getAllSemesters();
@@ -60,22 +62,28 @@ public class SemesterAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause("Failed to fetch Semesters");
             }
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
-            }.getType())).build();
+
         } catch (Exception e) {
             payload = new APIResponse();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
+
         }
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
+        String json = gson.toJson(payload);
+
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
     }
 
 
     @GET
     @Path("/semester/{uuid}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getSemester(@PathParam("uuid") String uuid) {
         APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
-
         SemesterManager semesterManager = new SemesterManager();
 
         try {
@@ -88,14 +96,21 @@ public class SemesterAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause("Role with name :" + semester + " does not exist");
             }
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
-            }.getType())).build();
+
         } catch (Exception e) {
             e.printStackTrace();
             payload = new APIResponse();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
         }
+
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
+        String json = gson.toJson(payload);
+
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
     }
 
 }

@@ -54,7 +54,7 @@ public class ProfessorManager {
                           String secretAnswer, String active) {
 
 
-        Professor professor = new Professor();
+        Professor professor = new Professor(profId);
         professor.setProfId(profId);
         professor.setAvailable(Utils.convertStringToBool(available));
 
@@ -97,8 +97,6 @@ public class ProfessorManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -208,8 +206,6 @@ public class ProfessorManager {
                 e.printStackTrace();
 
                 return DatabaseUtil.getCauseMessage(e);
-            } finally {
-                entityManager.close();
             }
 
         } else
@@ -247,8 +243,6 @@ public class ProfessorManager {
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -291,8 +285,6 @@ public class ProfessorManager {
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -328,8 +320,6 @@ public class ProfessorManager {
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -373,8 +363,6 @@ public class ProfessorManager {
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -473,8 +461,6 @@ public class ProfessorManager {
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -501,10 +487,7 @@ public class ProfessorManager {
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
-
     }
 
 

@@ -52,7 +52,7 @@ public class StudentManager {
                              String secretAnswer, String active) {
 
 
-        Student student = new Student();
+        Student student = new Student(studentId, firstName, Utils.convertIntegerToString(maxCourses));
         student.setStudentId(studentId);
         student.setStudentStatus(studentStatus);
         student.setMaxCourses(Utils.convertIntegerToString(maxCourses));
@@ -193,8 +193,6 @@ public class StudentManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -229,8 +227,6 @@ public class StudentManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -273,8 +269,6 @@ public class StudentManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -310,8 +304,6 @@ public class StudentManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -353,8 +345,6 @@ public class StudentManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -390,8 +380,6 @@ public class StudentManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -434,8 +422,6 @@ public class StudentManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -471,8 +457,6 @@ public class StudentManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -515,8 +499,6 @@ public class StudentManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -619,11 +601,53 @@ public class StudentManager {
             e.printStackTrace();
 
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
+
+
+    public String updateStudentObject(String uuid, Student studentId) {
+
+        entityManager.getTransaction().begin();
+        Query query = entityManager
+                .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
+        query.setParameter("uuid", uuid);
+        Student student = (Student) query.getSingleResult();
+        entityManager.getTransaction().commit();
+
+        System.out.println("student>>>>>>student>>>>>" + student.getUuid());
+
+        System.out.println("student>>>>>>>studentId>>>>" + studentId.getUuid());
+
+//        student=studentId;
+
+        student.setRecommendedCourses(studentId.getRecommendedCourses());
+
+
+        try {
+            entityManager.getTransaction().begin();
+            entityManager.merge(student);
+            entityManager.getTransaction().commit();
+
+            return "OK";
+        } catch (RollbackException e) {
+            e.printStackTrace();
+
+            String code = DatabaseUtil.getSqlErrorCode(e);
+
+            logger.info("Error creating student: '{}'" + code);
+
+
+            return DatabaseUtil.getCauseMessage(e);
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return DatabaseUtil.getCauseMessage(e);
+        }
+
+    }
+
+
 
     public String addStudentCompletedCourseCSV(String studentId, String courseId) {
         try {
@@ -711,14 +735,14 @@ public class StudentManager {
     }
 
 
-    public String addStudentPreferredCourseCSV(String studentId, String courseId) {
+    public String addStudentPreferredCourseCSV(String uuid, String courseId) {
         try {
 
 
             entityManager.getTransaction().begin();
             Query query = entityManager
-                    .createNamedQuery("com.cs6310.backend.model.Student.getByStudentId");
-            query.setParameter("studentId", studentId);
+                    .createNamedQuery("com.cs6310.backend.model.Student.getByUUID");
+            query.setParameter("uuid", uuid);
             Student student = (Student) query.getSingleResult();
 
             Query querycourse = entityManager

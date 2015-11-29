@@ -22,6 +22,8 @@ public class CoursesSemestersCSV {
     public String currentEnrollment;
     public String semesterName;
 
+    public String semesterId;
+
     public String semesterYear;
     public String prerequisite;
 

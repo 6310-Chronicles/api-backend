@@ -99,8 +99,6 @@ public class TeachingAssistantManager {
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -142,8 +140,6 @@ public class TeachingAssistantManager {
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -178,8 +174,6 @@ public class TeachingAssistantManager {
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -220,8 +214,6 @@ public class TeachingAssistantManager {
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -246,8 +238,6 @@ public class TeachingAssistantManager {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        } finally {
-            entityManager.close();
         }
 
     }
@@ -324,8 +314,6 @@ public class TeachingAssistantManager {
         } catch (Exception e) {
             e.printStackTrace();
             return DatabaseUtil.getCauseMessage(e);
-        } finally {
-            entityManager.close();
         }
 
     }

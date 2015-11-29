@@ -13,6 +13,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:3.8.1" level="project" />
+    <orderEntry type="library" name="Maven: mysql:mysql-connector-java:5.1.22" level="project" />
     <orderEntry type="library" name="Maven: org.apache.openjpa:openjpa-persistence-jdbc:2.4.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.openjpa:openjpa-jdbc:2.4.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.openjpa:openjpa-kernel:2.4.0" level="project" />

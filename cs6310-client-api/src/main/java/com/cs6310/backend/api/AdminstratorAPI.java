@@ -6,7 +6,6 @@ import com.cs6310.backend.response.APIResponse;
 import com.cs6310.backend.response.ResponseStatus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -19,6 +18,7 @@ public class AdminstratorAPI {
     @POST
     @Path("/create")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response create(
             @FormParam("administratorId") String administratorId,
             @FormParam("lastName") String lastName,
@@ -49,16 +49,19 @@ public class AdminstratorAPI {
             payload.setErrorCause(error);
         }
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
         String json = gson.toJson(payload);
 
-
-        return Response.ok(json, MediaType.APPLICATION_JSON).build();
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
     }
 
     @POST
     @Path("/update")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response update(
             @FormParam("uuid") String uuid,
             @FormParam("administratorId") String administratorId,
@@ -89,17 +92,19 @@ public class AdminstratorAPI {
             payload.setErrorCause(error);
         }
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
         String json = gson.toJson(payload);
 
-        return Response.ok(json, MediaType.APPLICATION_JSON).build();
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
     }
-
-
 
 
     @GET
     @Path("/allAdminstrators")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getAllAdminstrators() {
         APIResponse payload = new APIResponse();
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
@@ -118,19 +123,29 @@ public class AdminstratorAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(" This :" + list + " does not exist");
             }
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
-            }.getType())).build();
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
         } catch (Exception e) {
             e.printStackTrace();
             payload = new APIResponse();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
         }
     }
 
 
     @GET
     @Path("/administrator/{uuid}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getAdmin(@PathParam("uuid") String uuid) {
         APIResponse payload = new APIResponse();
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
@@ -147,12 +162,21 @@ public class AdminstratorAPI {
                 payload.setStatus(ResponseStatus.FAILED);
                 payload.setErrorCause(" This :" + uuid + " does not exist");
             }
-            return Response.status(Response.Status.OK).entity(gson.toJson(payload, new TypeToken<APIResponse>() {
-            }.getType())).build();
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
         } catch (Exception e) {
             payload = new APIResponse();
             payload.setStatus(ResponseStatus.FAILED);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(gson.toJson(payload)).build();
+
+            String json = gson.toJson(payload);
+
+            return Response.ok(json)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .build();
         }
     }
 
@@ -160,9 +184,9 @@ public class AdminstratorAPI {
     @POST
     @Path("/deleteAdminByUUID")
     @Consumes({"application/json", "application/x-www-form-urlencoded", "multipart/form-data", "text/plain"})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response deleteCourseByUUID(@FormParam("uuid") String uuid) {
         APIResponse payload = new APIResponse();
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try {
             AdministratorManager administratorManager = new AdministratorManager();
             String response = administratorManager.deleteAdministratorByUUID(uuid);
@@ -177,7 +201,13 @@ public class AdminstratorAPI {
             e.printStackTrace();
             payload.setStatus(ResponseStatus.FAILED);
         }
-        return Response.status(Response.Status.OK).entity(gson.toJson(payload)).build();
+        Gson gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+
+        String json = gson.toJson(payload);
+
+        return Response.ok(json)
+                .header("Access-Control-Allow-Origin", "*")
+                .build();
     }
 
 

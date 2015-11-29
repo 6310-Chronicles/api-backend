@@ -65,6 +65,14 @@ public class Professor implements Serializable {
     private List<Course> teachingCourseList = new ArrayList<>();
 
 
+    // Added by Duy
+    public Professor(String profId) {
+        this.profId = profId;
+    }
+
+    public Professor() {
+    }
+
     public boolean isAvailable() {
         return available;
     }
@@ -81,7 +89,6 @@ public class Professor implements Serializable {
         this.personDetails = personDetails;
     }
 
-
     public String getUuid() {
         return uuid;
     }
@@ -97,7 +104,6 @@ public class Professor implements Serializable {
     public void setAccessCredential(AccessCredential accessCredential) {
         this.accessCredential = accessCredential;
     }
-
 
     public List<Course> getTeachingCourseList() {
         if (teachingCourseList == null)
